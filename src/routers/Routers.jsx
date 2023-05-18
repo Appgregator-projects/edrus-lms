@@ -29,6 +29,7 @@ import QuizPage from '../pages/teachers/Dashboard/Quiz/Quiz';
 import AssignmentPage from '../pages/teachers/Dashboard/Assignment/Assignment';
 import CreateLessonsPage from '../pages/teachers/Dashboard/Lessons/CreateLessons';
 import LessonPage from '../pages/teachers/Dashboard/Courses/LessonPage';
+import CreateLesson from '../pages/teachers/Dashboard/Courses/CreateLesson';
 
 const Routers = () => {
 	return (
@@ -40,6 +41,7 @@ const Routers = () => {
 
 
 			<Route path="/courses/:course_id" element={<CoursesStructurePage />} />
+			<Route path="/courses/:course_id/lesson/:lesson_id" element={<CoursesStructurePage />} />
 			<Route path="/courses/:course_id/sections/:section_id" element={<TopicsPage />} />
 			<Route path="/courses/:course_id/sections/:section_id/lesson/:lesson_id" element={<LessonPage />} />
 			<Route path="/courseStructure" element={<CoursesStructurePage />} />
@@ -58,6 +60,7 @@ const Routers = () => {
 			<Route path="/teacher/courses" element={<CoursesPages />} />
 			<Route path="/teacher/courses/create" element={<CreateCoursesPage />} />
 			<Route path="/teacher/courses/:id" element={<SingleCoursePage />} />
+			<Route path="/teacher/courses/:id/lesson/:lessonId" element={<CreateLesson />} />
 			<Route path="/teacher/courses/edit" element={<EditCoursesPage />} />
 
 			{/* course - section - lesson */}
