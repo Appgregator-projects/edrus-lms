@@ -9,40 +9,67 @@ import {
 	Input,
 	InputGroup,
 	InputRightElement,
-	Link,
 	Spinner,
 	Text,
 } from '@chakra-ui/react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { authFirebase } from '../../config/firebase';
-import { useNavigate } from 'react-router-dom';
+import { authFirebase, db } from '../../config/firebase';
+import { Link, useNavigate } from 'react-router-dom';
+import { UseAuthDispatch, UseAuthState } from '../../context/Context';
+import { doc, getDoc } from 'firebase/firestore';
 
 const Signin = () => {
-	const [email,setEmail] = useState('')
-	const [loading, setLoading] = useState(false)
-	const [password,setPassword] = useState('')
+	const [email, setEmail] = useState('')
+	const [password, setPassword] = useState('')
+	const { loading } = UseAuthState();
 	const navigate = useNavigate();
 	const [showPassword, setShowPassword] = useState(false);
 	const handleTogglePassword = () => setShowPassword(!showPassword);
+	const dispatch = UseAuthDispatch();
 
 	const handleKeyDown = (e) => {
 		// e.preventDefault()
 		if (e.key === "Enter") handleLogin()
 	};
 
-	const handleLogin = () => {
-		setLoading(true)
-		console.log(email, password)
+	const handleLogin = async () => {
+		dispatch({ type: "INIT_START" })
+		let uid;
+		let data;
 		signInWithEmailAndPassword(authFirebase, email, password).then(response => {
-			navigate('/')
-			localStorage.setItem('user', JSON.stringify(response.user))
+			localStorage.setItem('user', JSON.stringify(response.user));
+			uid = response.user.uid;
+			data = response.user;
+
+			dispatch({ type: "LOGIN_SUCCESS", payload: data })
 		}).catch(e => {
 			alert(e.message)
-		}).finally(()=>{
-			setLoading(false)
 		})
-	}
+			.finally(() => {
+				dispatch({ type: "INIT_FINISH" })
+				navigate('/')
+			})
+
+
+		async function getUserData() {
+			const docRef = doc(db, "users", uid);
+			const docSnap = await getDoc(docRef);
+
+			if (docSnap) {
+				dispatch({ type: "LOGIN_SUCCESS", payload: docSnap.data() })
+			} else {
+				console.log("Document not found in users collection");
+				dispatch({ type: "LOGIN_SUCCESS", payload: data })
+			};
+		}
+
+		if (uid) {
+			getUserData()
+		} else {
+			setTimeout(()=> getUserData(), 2000)
+		}
+	};
 
 	return (
 		<>
@@ -92,9 +119,9 @@ const Signin = () => {
 							</InputGroup>
 						</FormControl>
 						<Button w="100%" my="5" bgColor="#2c698d" color="white" onClick={handleLogin}>
-							Login {!loading ? null : <Spinner mx={4}/>}
+							Login {!loading ? null : <Spinner mx={4} />}
 						</Button>
-						{/* <Link fontSize="14px">Don't have an account? Sign up </Link> */}
+						<Link to="/signup">Don't have an account? Sign up </Link>
 					</Box>
 				</Container>
 			</Box>

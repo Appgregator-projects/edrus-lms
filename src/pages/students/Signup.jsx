@@ -10,12 +10,15 @@ import {
   InputGroup,
   InputRightElement,
   Link,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom';
-import { authFirebase } from '../../config/firebase'
+import { authFirebase, db } from '../../config/firebase'
+import { UseAuthDispatch } from '../../context/Context';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,21 +28,39 @@ const Signup = () => {
   const _showPassword = () => setShowPassword(!showPassword);
   const navigate = useNavigate();
   const renderRef = useRef()
-
-    console.count('render : ', renderRef.current)
+  const [loading, setLoading] = useState(false)
+  const dispatch = UseAuthDispatch();
+  console.count('render : ', renderRef.current)
 
   const _signUp = async () => {
-    console.log({email})
-    console.log({password})
+    setLoading(true)
+    console.log({ email })
+    console.log({ password })
     createUserWithEmailAndPassword(authFirebase, email, password).then(response => {
       navigate('/')
       localStorage.setItem('user', JSON.stringify(response.user))
-    }).catch(error =>{
-      console.log(error.message)
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: response.user
+      })
+      setDoc(doc(db, "users", response.user.uid), {
+        name,
+        email,
+        role: "user",
+        phone: null,
+        membership: null,
+        createdAt: serverTimestamp()
+      });
+    }).catch(error => {
       alert(error.message)
+    }).finally(() => {
+      setLoading(false)
     })
   }
-
+  
+  const onEnter = (e) => {
+    if (e.key === "Enter") _signUp();
+  }
   return (
     <>
       <Box
@@ -66,11 +87,11 @@ const Signup = () => {
           >
             <FormControl>
               <FormLabel>Name</FormLabel>
-              <Input type="text" placeholder="Enter name" onChange={useCallback((e)=>{setName(e.target.value)},[])}/>
+              <Input type="text" placeholder="Enter name" onChange={useCallback((e) => { setName(e.target.value) }, [])} />
             </FormControl>
             <FormControl>
               <FormLabel>Email</FormLabel>
-              <Input type="email" placeholder="Enter email" onChange={e=>setEmail(e.target.value)}/>
+              <Input type="email" placeholder="Enter email" onChange={e => setEmail(e.target.value)} />
             </FormControl>
             <FormControl>
               <FormLabel>Password</FormLabel>
@@ -79,7 +100,8 @@ const Signup = () => {
                   pr="4.5rem"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter password"
-                  onChange={useCallback((e)=>{setPassword(e.target.value)},[])}
+                  onChange={useCallback((e) => { setPassword(e.target.value) }, [])}
+                  onKeyDown={onEnter}
                 />
                 <InputRightElement width="4.5rem">
                   <Button h="1.75rem" size="sm" onClick={_showPassword}>
@@ -88,8 +110,8 @@ const Signup = () => {
                 </InputRightElement>
               </InputGroup>
             </FormControl>
-            <Button w="100%" my="5" bgColor="#2c698d" color="white" onClick={()=>_signUp()}>
-              Sign up
+            <Button w="100%" my="5" bgColor="#2c698d" color="white" onClick={() => _signUp()}>
+              Sign up {loading ? <Spinner mx={5} /> : <></>}
             </Button>
             <Link fontSize="14px" href="/login">Have an account? Login </Link>
           </Box>
