@@ -36,6 +36,7 @@ import OffersPage from "../pages/teachers/Dashboard/Sales/Offer/Offers";
 import NewOffer from "../pages/teachers/Dashboard/Sales/Offer/NewOffer";
 import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNewOffer";
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
+import EditOfferPage from "../pages/teachers/Dashboard/Sales/Offer/EditOffer";
 
 const Routers = () => {
 	return (
@@ -134,6 +135,11 @@ const Routers = () => {
 			<Route
 				path="/teacher/settings/payment"
 				element={<PaymentPage />}
+			/>
+
+			<Route
+				path="/teacher/setting/offers/:id/edit"
+				element={<EditOfferPage />}
 			/>
 		</Routes>
 	);

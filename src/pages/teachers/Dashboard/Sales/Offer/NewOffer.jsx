@@ -222,6 +222,11 @@ const NewOffer = () => {
 									colorScheme="blackAlpha"
 									color="white"
 									w="100%"
+									onClick={() =>
+										navigate(
+											"/teacher/setting/offers/1234/edit"
+										)
+									}
 								>
 									Save and Finish
 								</Button>
