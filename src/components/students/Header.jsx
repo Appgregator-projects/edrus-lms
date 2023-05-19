@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 const Header = () => {
   const dispatch = UseAuthDispatch();
   const { loading, user } = UseAuthState();
+  const state = UseAuthState()
   const navigate = useNavigate();
 
 
@@ -53,7 +54,7 @@ const Header = () => {
         src="https://demo.learndash.com/wp-content/uploads/2022/04/learndash-demo-logo-1.svg"
         alt="logo"
         h="20px"
-        onClick={()=>console.log(user)}
+        onClick={()=>console.log(state)}
       />
       <Spacer />
       <Flex gap="5">

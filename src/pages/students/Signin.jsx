@@ -43,6 +43,7 @@ const Signin = () => {
 			data = response.user;
 
 			dispatch({ type: "LOGIN_SUCCESS", payload: data })
+			console.log(data, "userCredentials")
 		}).catch(e => {
 			alert(e.message)
 		})

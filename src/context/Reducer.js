@@ -8,7 +8,7 @@ let user = localStorage.getItem('user')
 
 export const initialState = {
   course: [] || course,
-  user : null || user,
+  user : {} || user,
   error : null,
   loading : false
 };

@@ -40,7 +40,7 @@ const Routers = () => {
 			<Route exact path="/" element={
 				<ProtectedRoute user={user} redirectPath='/login'>
 					<Homepage />
-				 </ProtectedRoute>
+				</ProtectedRoute>
 			} />
 			<Route path="/courses" element={
 				<ProtectedRoute user={user} redirectPath='/login'>
@@ -134,7 +134,8 @@ const Routers = () => {
 			} />
 
 			<Route path="/teacher/dashboard" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				// <ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user} redirectPath='/'>
 					<DashboardPage />
 				</ProtectedRoute>
 
