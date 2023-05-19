@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from "react";
 import {
 	IconButton,
 	Box,
@@ -20,45 +20,42 @@ import {
 	PopoverArrow,
 	PopoverBody,
 	Circle,
-} from '@chakra-ui/react';
-import { FiHome, FiMenu, FiSettings, FiUsers } from 'react-icons/fi';
-import { IconType } from 'react-icons';
+} from "@chakra-ui/react";
+import { FiHome, FiMenu, FiSettings, FiUsers } from "react-icons/fi";
+import { IconType } from "react-icons";
 import {
 	BsDoorOpenFill,
 	BsBook,
 	BsFileCheck,
 	BsEnvelope,
-} from 'react-icons/bs';
+} from "react-icons/bs";
 
-import { useNavigate } from 'react-router-dom';
-import { UseAuthDispatch } from '../../context/Context';
-import { signOut } from 'firebase/auth';
-import { authFirebase } from '../../config/firebase';
+import { useNavigate } from "react-router-dom";
 interface LinkItemProps {
 	name: string;
 	icon: IconType;
 }
 const LinkItems: Array<LinkItemProps> = [
-	{ name: 'Dashboard', icon: FiHome, link: '/teacher/dashboard' },
-	{ name: 'Course', icon: BsBook, link: '/teacher/courses' },
+	{ name: "Dashboard", icon: FiHome, link: "/teacher/dashboard" },
+	{ name: "Course", icon: BsBook, link: "/teacher/courses" },
 	// { name: 'Sections', icon: AiOutlineSnippets, link: '/teacher/sections' },
 	// { name: 'Lessons', icon: RiFileList2Line, link: '/teacher/lessons' },
 	// { name: 'Assignment', icon: FaTasks, link: '/teacher/assignment' },
 	// { name: 'Quiz', icon: BsFileCheck, link: '/teacher/quiz' },
-	{ name: 'Sales', icon: BsFileCheck, link: '/teacher/quiz' },
-	{ name: 'People', icon: FiUsers, link: '/teacher/quiz' },
-	{ name: 'Setting', icon: FiSettings, link: '/teacher/quiz' },
+	{ name: "Sales", icon: BsFileCheck, link: "/teacher/offers/new/banner" },
+	{ name: "Customers", icon: FiUsers, link: "/teacher/customers" },
+	{ name: "Setting", icon: FiSettings, link: "/teacher/settings" },
 
-	{ name: 'Logout', icon: BsDoorOpenFill, link: '/login' },
+	{ name: "Logout", icon: BsDoorOpenFill, link: "/teacher/login" },
 ];
 
 export default function Sidebar({ children }: { children: ReactNode }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	return (
-		<Box minH="100vh" bg={useColorModeValue('white')}>
+		<Box minH="100vh" bg={useColorModeValue("white")}>
 			<SidebarContent
 				onClose={() => onClose}
-				display={{ base: 'none', md: 'block' }}
+				display={{ base: "none", md: "block" }}
 			/>
 			<Drawer
 				autoFocus={false}
@@ -111,24 +108,36 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 	return (
 		<Box
 			transition="3s ease"
-			bg={useColorModeValue('white', 'gray.900')}
+			bg={useColorModeValue("white", "gray.900")}
 			borderRight="1px"
-			borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-			w={{ base: 'full', md: 60 }}
+			borderRightColor={useColorModeValue("gray.200", "gray.700")}
+			w={{ base: "full", md: 60 }}
 			pos="fixed"
 			h="full"
 			{...rest}
 		>
-			<Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-				<Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+			<Flex
+				h="20"
+				alignItems="center"
+				mx="8"
+				justifyContent="space-between"
+			>
+				<Text
+					fontSize="2xl"
+					fontFamily="monospace"
+					fontWeight="bold"
+				>
 					<Image
 						src="https://demo.learndash.com/wp-content/uploads/2022/04/learndash-demo-logo-1.svg"
 						alt="img-logo"
 					/>
 				</Text>
-				<CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
+				<CloseButton
+					display={{ base: "flex", md: "none" }}
+					onClick={onClose}
+				/>
 			</Flex>
-			{LinkItems.filter(link => link.name !== "Logout").map(link => (
+			{LinkItems.map((link) => (
 				<NavItem
 					key={link.name}
 					icon={link.icon}
@@ -156,8 +165,8 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
 	return (
 		<Link
 			href="#"
-			style={{ textDecoration: 'none' }}
-			_focus={{ boxShadow: 'none' }}
+			style={{ textDecoration: "none" }}
+			_focus={{ boxShadow: "none" }}
 		>
 			<Flex
 				align="center"
@@ -167,8 +176,8 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
 				role="group"
 				cursor="pointer"
 				_hover={{
-					bg: 'cyan.400',
-					color: 'white',
+					bg: "cyan.400",
+					color: "white",
 				}}
 				{...rest}
 			>
@@ -177,7 +186,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
 						mr="4"
 						fontSize="16"
 						_groupHover={{
-							color: 'white',
+							color: "white",
 						}}
 						as={icon}
 					/>
@@ -200,32 +209,38 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 			px={{ base: 4, md: 4 }}
 			height="20"
 			alignItems="center"
-			bg={useColorModeValue('white', 'gray.900')}
+			bg={useColorModeValue("white", "gray.900")}
 			borderBottomWidth="1px"
-			borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
+			borderBottomColor={useColorModeValue("gray.200", "gray.700")}
 			justifyContent="right"
 			{...rest}
 			gap="5"
 		>
-			<Flex gap="1" onClick={() => navigate('/teacher/inbox')} cursor="pointer">
+			<Flex
+				gap="1"
+				onClick={() => navigate("/teacher/inbox")}
+				cursor="pointer"
+			>
 				<BsEnvelope fontSize="20px" />
 				<sup>
 					<Text>1</Text>
 				</sup>
 			</Flex>
-			<Popover islazy trigger={'hover'}>
+			<Popover islazy trigger={"hover"}>
 				<PopoverTrigger>
 					<Link>Hi, User1</Link>
 				</PopoverTrigger>
 				<PopoverContent bgColor="#2c698d" w="100%" color="white">
 					<PopoverArrow bgColor="#2c698d" />
 					<PopoverBody>
-						<Link onClick={() => navigate('/login')}>Log Out</Link>
+						<Link onClick={() => navigate("/login")}>
+							Log Out
+						</Link>
 					</PopoverBody>
 				</PopoverContent>
 			</Popover>
 			<IconButton
-				display={{ base: 'flex', md: 'none' }}
+				display={{ base: "flex", md: "none" }}
 				onClick={onOpen}
 				variant="outline"
 				aria-label="open menu"
