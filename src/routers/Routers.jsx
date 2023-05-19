@@ -36,10 +36,7 @@ import OffersPage from "../pages/teachers/Dashboard/Sales/Offer/Offers";
 import NewOffer from "../pages/teachers/Dashboard/Sales/Offer/NewOffer";
 import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNewOffer";
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
-import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
-import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";
-import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
-import SettingPage from "../pages/teachers/Dashboard/Settings/SettingPage";
+import EditOfferPage from "../pages/teachers/Dashboard/Sales/Offer/EditOffer";
 
 const Routers = () => {
 	const { user } = UseAuthState();
@@ -279,6 +276,11 @@ const Routers = () => {
 			<Route
 				path="/teacher/settings/payment"
 				element={<PaymentPage />}
+			/>
+
+			<Route
+				path="/teacher/setting/offers/:id/edit"
+				element={<EditOfferPage />}
 			/>
 		</Routes>
 	);
