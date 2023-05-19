@@ -134,102 +134,126 @@ const Routers = () => {
 			} />
 
 			<Route path="/teacher/dashboard" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<DashboardPage />
 				</ProtectedRoute>
 
 			} />
 
 			<Route path="/teacher/courses" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<CoursesPages />
 				</ProtectedRoute>
 
 			} />
 			<Route path="/teacher/courses/create" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<CreateCoursesPage />
 				</ProtectedRoute>
 
 			} />
 			<Route path="/teacher/courses/:id" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<SingleCoursePage />
 				</ProtectedRoute>
 
 			} />
-			<Route path="/teacher/courses/:id/lesson/:lessonId" element={<CreateLesson />} />
+			<Route path="/teacher/courses/:id/lesson/:lessonId" element={
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
+					<CreateLesson />
+				</ProtectedRoute>
+			} />
 			<Route path="/teacher/courses/edit" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<EditCoursesPage />
 				</ProtectedRoute>
 
 			} />
 
 			{/* ======================================================================== */}
-			<Route path="/teacher/courses" element={<CoursesPages />} />
-			<Route path="/teacher/courses/create" element={<CreateCoursesPage />} />
-			<Route path="/teacher/courses/:id" element={<SingleCoursePage />} />
-			<Route path="/teacher/courses/:id/lesson/:lessonId" element={<CreateLesson />} />
-			<Route path="/teacher/courses/edit" element={<EditCoursesPage />} />
+			<Route path="/teacher/courses" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CoursesPages />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/courses/create" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CreateCoursesPage />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/courses/:id" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<SingleCoursePage />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/courses/:id/lesson/:lessonId" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CreateLesson />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/courses/edit" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<EditCoursesPage />
+				</ProtectedRoute>
+			} />
 			{/* ======================================================================== */}
 
 
 			{/* course - section - lesson */}
 			<Route path="/teacher/sections" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<SectionsPage />
 				</ProtectedRoute>
 
 			} />
 			<Route path="/teacher/sections/create" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<CreateSectionsPage />
 				</ProtectedRoute>
 
 			} />
 			<Route path="/teacher/sections/edit" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<EditSectionsPage />
 				</ProtectedRoute>
 
 			} />
 
 			<Route path="/teacher/lessons" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<Lessons />
 				</ProtectedRoute>
 
 			} />
 			<Route path="/teacher/lessons/create" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<CreateLessonsPage />
 				</ProtectedRoute>
 
 			} />
 
 			<Route path="/teacher/users" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<UserPage />
 				</ProtectedRoute>
 
 			} />
 			<Route path="/teacher/users/create" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<CreateUsersPage />
 				</ProtectedRoute>
 
 			} />
 
 			<Route path="/teacher/quiz" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<QuizPage />
 				</ProtectedRoute>
 
 			} />
 
 			<Route path="/teacher/assignment" element={
-				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
+				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<AssignmentPage />
 				</ProtectedRoute>
 

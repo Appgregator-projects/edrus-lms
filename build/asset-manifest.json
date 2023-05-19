@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/static/css/main.6069912e.css",
+    "main.js": "/static/js/main.0705f471.js",
+    "static/js/787.9a0ab4d0.chunk.js": "/static/js/787.9a0ab4d0.chunk.js",
+    "static/media/summernote.eot": "/static/media/summernote.bd0d8be1fbad3612dfe1.eot",
+    "static/media/summernote.ttf": "/static/media/summernote.b293d601cf1cddd1a1b4.ttf",
+    "static/media/summernote.woff": "/static/media/summernote.08c343ff91f188dfc1a7.woff",
+    "static/media/summernote.woff2": "/static/media/summernote.7c9436ed8d2deac04e37.woff2",
+    "index.html": "/index.html",
+    "main.6069912e.css.map": "/static/css/main.6069912e.css.map",
+    "main.0705f471.js.map": "/static/js/main.0705f471.js.map",
+    "787.9a0ab4d0.chunk.js.map": "/static/js/787.9a0ab4d0.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6069912e.css",
+    "static/js/main.0705f471.js"
+  ]
+}

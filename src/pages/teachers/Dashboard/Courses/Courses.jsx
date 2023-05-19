@@ -58,6 +58,7 @@ import { BsCircle, BsFileCheck, BsFileText } from 'react-icons/bs';
 import { useState } from 'react';
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
+import { UseAuthDispatch, UseAuthState } from '../../../../context/Context';
 
 
 const Courses = () => {
@@ -66,10 +67,20 @@ const Courses = () => {
 	const [courses, setCourses] = useState()
 
 	const authentication = { projectId: 'SgCWDWIda9kqrTF80nY9' }
+	const {user, user_uid} = UseAuthState();
+	const dispatch = UseAuthDispatch()
+	const {loading} = UseAuthState()
 
 
 	const getCourses = async () => {
-		const q = query(collection(db, `courses/`), where("project", "==", authentication.projectId, orderBy("lastUpdated"), limit(25)));
+		console.log(user.uid, "uid yang mau diambil")
+		dispatch({
+			type : "INIT_START"
+		})
+		// const q = query(collection(db, `courses/`), where("project", "==", uid, orderBy("lastUpdated"), limit(25)));
+		const q = query(collection(db, "courses"), where("uid", "==", (user.uid === undefined ? user_uid : user.uid))
+		// , orderBy("lastUpdated", "desc"), limit(25)
+		)
 		const querySnapshot = await getDocs(q);
 
 		const sections = []
@@ -80,8 +91,12 @@ const Courses = () => {
 			})
 		});
 		console.log(sections, 'ini data sections')
-		setCourses(sections)
-
+		if (sections) {
+			setCourses(sections)
+			dispatch({
+				type : "INIT_FINISH"
+			})
+		}
 	}
 
 	useEffect(() => {
@@ -166,11 +181,14 @@ const Courses = () => {
 							</Flex>
 						</HStack>)
 					:
-					<Center>
-						<Spinner />
-					</Center>
-				}
 
+					loading ? <Center>
+					<Spinner />
+				</Center> : 
+				<>
+					<Text>Belum ada course</Text>
+				</>
+				}
 			</Box>
 
 

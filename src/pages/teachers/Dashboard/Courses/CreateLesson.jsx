@@ -17,11 +17,14 @@ import {
 import { FiDelete, FiDownload, FiEdit3 } from 'react-icons/fi';
 import Sidebar from '../../../../components/teachers/Sidebar';
 import { db } from '../../../../config/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { useParams } from 'react-router-dom';
+import { deleteDoc, doc, getDoc } from 'firebase/firestore';
+import { useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2'
+
 function CreateLesson() {
 	const [data, setData] = useState()
 	const { id, lessonId } = useParams();
+	const navigate = useNavigate()
 
 	const getLesson = async () => {
 		const docRef = doc(db, `courses/${id}/lesson`, lessonId);
@@ -32,6 +35,26 @@ function CreateLesson() {
 		} else {
 			console.log("No such document!");
 		}
+	}
+
+
+	const confirmDelete = async () => {
+		Swal.fire({
+			title: `Do you want to delete ${data.title}?`,
+			showDenyButton: true,
+			showCancelButton: false,
+			confirmButtonText: 'Delete',
+			denyButtonText: `Cancel`,
+		}).then((result) => {
+			/* Read more about isConfirmed, isDenied below */
+			if (result.isConfirmed) {
+				Swal.fire('Saved!', '', 'success')
+				deleteDoc(doc(db, `courses/${id}/lesson`, lessonId));
+				navigate(`/teacher/courses/${id}`)
+			} else if (result.isDenied) {
+				Swal.fire('Changes are not saved', '', 'info')
+			}
+		})
 	}
 
 	useEffect(() => {
@@ -46,6 +69,7 @@ function CreateLesson() {
 				<HStack>
 					<Heading>{data?.title ? data.title : <></>}</Heading>
 					<Spacer />
+					<Button colorScheme='red' onClick={confirmDelete}>Delete</Button>
 					<Button colorScheme='green'>Save</Button>
 				</HStack>
 				<Flex>

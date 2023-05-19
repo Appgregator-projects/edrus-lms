@@ -58,10 +58,10 @@ const Signin = () => {
 			const docSnap = await getDoc(docRef);
 
 			if (docSnap) {
-				dispatch({ type: "LOGIN_SUCCESS", payload: docSnap.data() })
+				dispatch({ type: "LOGIN_SUCCESS", payload: {user : docSnap.data(), user_uid : uid} })
 			} else {
 				console.log("Document not found in users collection");
-				dispatch({ type: "LOGIN_SUCCESS", payload: data })
+				dispatch({ type: "LOGIN_SUCCESS", payload: {user :data, user_uid : data.uid} })
 			};
 		}
 

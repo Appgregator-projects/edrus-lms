@@ -34,13 +34,15 @@ import { useNavigate } from 'react-router-dom';
 import { FiDelete, FiDownload, FiEdit3, FiMinimize } from 'react-icons/fi';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
+import { UseAuthState } from '../../../../context/Context';
 
 const CreateCourses = () => {
 	const navigate = useNavigate();
 	const [course, setCourse] = useState({});
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const [courseType, setCourseType] = useState()
-	const authentication = { uid: 'oY9VWqgTZOfytiw451GpuESO5C32', project: 'SgCWDWIda9kqrTF80nY9' }
+	const { user : { uid }, project_id} = UseAuthState()
+	const authentication = { uid, project: project_id }
 	const [loading, setLoading] = useState(false)
 
 	const product = [
@@ -97,7 +99,7 @@ const CreateCourses = () => {
 				<ModalBody>
 					<Input type='text' placeholder='Title' onChange={(e) => setCourse({ ...course, title: e.target.value })} />
 					<Textarea placeholder='Description' onChange={(e) => setCourse({ ...course, description: e.target.value })} />
-					<Input type='file' onChange={(e) => setCourse({ ...course, image: e.target.value })} />
+					<Input type='file' onChange={(e) => setCourse({ ...course, image: e.target.files[0] })} />
 
 				</ModalBody>
 

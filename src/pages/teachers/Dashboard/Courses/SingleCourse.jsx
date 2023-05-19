@@ -47,12 +47,18 @@ import { db } from '../../../../config/firebase';
 import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, updateDoc } from 'firebase/firestore';
 import { FiBookOpen, FiEdit2, FiEye, FiFolder, FiMessageCircle, FiVideo } from 'react-icons/fi';
 
+
+
+
 const SingleCourse = () => {
 	const navigate = useNavigate();
 	const { id } = useParams();
 	const [data, setData] = useState()
 	const [sectionTitle, setSectionTitle] = useState()
 	const { isOpen, onOpen, onClose } = useDisclosure()
+	const [lessonTitle, setLessonTitle] = useState([])
+	const [modalFor, setModalFor] = useState('')
+	const [sectionOnEdit, setSectionOnEdit] = useState('')
 
 	const getCourseDetail = async () => {
 		const unsub = onSnapshot(doc(db, "courses", id), (doc) => {
@@ -69,22 +75,32 @@ const SingleCourse = () => {
 		});
 	}
 
-	const handleAddLesson = async (section) => {
+	const handleAddLesson = async () => {
+		const section = sectionOnEdit
 		//ADD NEW LESSON FIRST AND GET THE ID
-		const docRef = await addDoc(collection(db, `courses/${id}/lesson`), { title: 'new Title' });
+		const docRef = await addDoc(collection(db, `courses/${id}/lesson`), { title: lessonTitle });
 		const lessonId = docRef.id;
 
 		//insert array union to courses db
 		const course = doc(db, "courses", id);
 		const result = await updateDoc(course, {
-			lessons: arrayUnion({ id: lessonId, title: 'New Lesson', section: section })
+			lessons: arrayUnion({ id: lessonId, title: lessonTitle, section: section })
 		});
 		console.log(result)
+		onClose()
 	}
 
 	const getLessons = (section) => {
 		if (data.lessons)
 			return data.lessons.filter((x) => x.section === section)
+	}
+
+	const handleOpenMmodal = (type, sectionTitle) => {
+		setModalFor(type)
+		onOpen()
+		if (type === "lesson") {
+			setSectionOnEdit(sectionTitle)
+		}
 	}
 
 	useEffect(() => {
@@ -120,7 +136,7 @@ const SingleCourse = () => {
 						</Box>
 						<Spacer />
 						<Center>
-							<Button colorScheme='blue' onClick={onOpen}>Add Section</Button>
+							<Button colorScheme='blue' onClick={()=>handleOpenMmodal('section')}>Add Section</Button>
 						</Center>
 					</Flex>
 				</Box>
@@ -147,7 +163,10 @@ const SingleCourse = () => {
 										<HStack>
 											<Heading fontSize='md' pl='5'>Lessons</Heading>
 											<Spacer />
-											<Button size='xs' colorScheme='green' onClick={() => handleAddLesson(x.title)}>Add Lesson</Button>
+											<Button size='xs' colorScheme='green' 
+											onClick={() => handleOpenMmodal('lesson', x.title)}
+											// onClick={() => handleAddLesson(x.title)}
+											>Add Lesson</Button>
 										</HStack>
 										{getLessons(x.title) ? getLessons(x.title).map((z) =>
 											<Box borderBottom='1px' pl='10' mb='2' borderColor='gray.50'>
@@ -189,17 +208,23 @@ const SingleCourse = () => {
 			<Modal isOpen={isOpen} onClose={onClose}>
 				<ModalOverlay />
 				<ModalContent>
-					<ModalHeader>Add section</ModalHeader>
+					<ModalHeader>Add {modalFor}</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-						<Input type='text' onChange={(e) => setSectionTitle(e.target.value)} />
+						{modalFor === "section" ? <Input type='text' placeholder='Insert section title' onChange={(e) => setSectionTitle(e.target.value)} /> : 
+												<Input type='text' placeholder='Insert lesson title' onChange={(e) => setLessonTitle(e.target.value)} />}
+
 					</ModalBody>
 
 					<ModalFooter>
 						{/* <Button colorScheme='blue' mr={3} onClick={onClose}>
 							Close
 						</Button> */}
-						<Button colorScheme='green' onClick={() => handleAddSection()}>Add</Button>
+						{modalFor === "section" ? 
+						<Button colorScheme='green' onClick={() => handleAddSection()}>Add Section</Button> : 
+						<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
+						}
+						
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
