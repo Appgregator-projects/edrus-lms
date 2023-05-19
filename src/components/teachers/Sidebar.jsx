@@ -43,8 +43,8 @@ const LinkItems: Array<LinkItemProps> = [
 	// { name: 'Assignment', icon: FaTasks, link: '/teacher/assignment' },
 	// { name: 'Quiz', icon: BsFileCheck, link: '/teacher/quiz' },
 	{ name: "Sales", icon: BsFileCheck, link: "/teacher/offers/new/banner" },
-	{ name: "People", icon: FiUsers, link: "/teacher/quiz" },
-	{ name: "Setting", icon: FiSettings, link: "/teacher/quiz" },
+	{ name: "Customers", icon: FiUsers, link: "/teacher/customers" },
+	{ name: "Setting", icon: FiSettings, link: "/teacher/settings" },
 
 	{ name: "Logout", icon: BsDoorOpenFill, link: "/teacher/login" },
 ];

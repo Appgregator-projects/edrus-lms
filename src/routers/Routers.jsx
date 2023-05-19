@@ -36,6 +36,10 @@ import OffersPage from "../pages/teachers/Dashboard/Sales/Offer/Offers";
 import NewOffer from "../pages/teachers/Dashboard/Sales/Offer/NewOffer";
 import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNewOffer";
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
+import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
+import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";
+import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
+import SettingPage from "../pages/teachers/Dashboard/Settings/SettingPage";
 
 const Routers = () => {
 	return (
@@ -78,6 +82,12 @@ const Routers = () => {
 			<Route path="/teacher/login" element={<SigninTeacher />} />
 			<Route path="teacher/signup" element={<SignupTeacher />} />
 			<Route path="/teacher/dashboard" element={<DashboardPage />} />
+
+			<Route path="/teacher/customers" element={<CustomersPage />} />
+			<Route path="/teacher/customers/:id" element={<CustomersSinglePage />} />
+			<Route path="/teacher/customers/tags" element={<CustomersTagsPage />} />
+
+			<Route path="/teacher/settings" element={<SettingPage />} />
 
 			<Route path="/teacher/courses" element={<CoursesPages />} />
 			<Route
