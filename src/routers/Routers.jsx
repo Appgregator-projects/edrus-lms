@@ -31,6 +31,7 @@ import CreateLessonsPage from '../pages/teachers/Dashboard/Lessons/CreateLessons
 import LessonPage from '../pages/teachers/Dashboard/Courses/LessonPage';
 import ProtectedRoute from '../routers/ProtectedRoute';
 import { UseAuthState } from '../context/Context';
+import CreateLesson from '../pages/teachers/Dashboard/Courses/CreateLesson';
 
 const Routers = () => {
 	const { user } = UseAuthState();
@@ -55,8 +56,15 @@ const Routers = () => {
 				<ProtectedRoute user={user} redirectPath='/login'>
 					<CoursesStructurePage />
 				</ProtectedRoute>
-
 			} />
+
+
+			<Route path="/courses/:course_id/lesson/:lesson_id" element={<CoursesStructurePage />} />
+			<Route path="/courses/:course_id/sections/:section_id" element={<TopicsPage />} />
+			<Route path="/courses/:course_id/sections/:section_id/lesson/:lesson_id" element={<LessonPage />} />
+			<Route path="/courseStructure" element={<CoursesStructurePage />} />
+			<Route path="/topics/:title" element={<TopicsPage />} />
+
 			<Route path="/courses/:course_id/sections/:section_id" element={
 				<ProtectedRoute user={user} redirectPath='/login'>
 					<TopicsPage />
@@ -150,12 +158,22 @@ const Routers = () => {
 				</ProtectedRoute>
 
 			} />
+			<Route path="/teacher/courses/:id/lesson/:lessonId" element={<CreateLesson />} />
 			<Route path="/teacher/courses/edit" element={
 				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
 					<EditCoursesPage />
 				</ProtectedRoute>
 
 			} />
+
+			{/* ======================================================================== */}
+			<Route path="/teacher/courses" element={<CoursesPages />} />
+			<Route path="/teacher/courses/create" element={<CreateCoursesPage />} />
+			<Route path="/teacher/courses/:id" element={<SingleCoursePage />} />
+			<Route path="/teacher/courses/:id/lesson/:lessonId" element={<CreateLesson />} />
+			<Route path="/teacher/courses/edit" element={<EditCoursesPage />} />
+			{/* ======================================================================== */}
+
 
 			{/* course - section - lesson */}
 			<Route path="/teacher/sections" element={
