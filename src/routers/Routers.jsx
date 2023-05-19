@@ -134,8 +134,7 @@ const Routers = () => {
 			} />
 
 			<Route path="/teacher/dashboard" element={
-				// <ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
-				<ProtectedRoute user={user} redirectPath='/'>
+				<ProtectedRoute user={user.role === "teacher"} redirectPath='/'>
 					<DashboardPage />
 				</ProtectedRoute>
 
