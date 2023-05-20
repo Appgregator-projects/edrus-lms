@@ -4,19 +4,19 @@ import {
 	Box,
 	Button,
 	Card,
+	Divider,
 	Flex,
 	Grid,
 	GridItem,
+	IconButton,
 	Image,
 	Input,
 	InputGroup,
 	InputLeftElement,
-	Popover,
-	PopoverArrow,
-	PopoverBody,
-	PopoverContent,
-	PopoverFooter,
-	PopoverTrigger,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
 	Tab,
 	TabList,
 	TabPanel,
@@ -41,8 +41,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { SearchIcon } from "@chakra-ui/icons";
 import {
 	FiBarChart,
+	FiChevronLeft,
+	FiChevronRight,
 	FiCopy,
-	FiDelete,
 	FiEye,
 	FiMoreHorizontal,
 	FiXCircle,
@@ -87,7 +88,9 @@ const Offers = () => {
 		<>
 			<Flex justify="space-between" align="center" mb="5">
 				<Flex gap="2" align="center">
-					<Text m="0">Offers</Text>
+					<Text m="0" fontWeight="semibold" fontSize="30px">
+						Offers
+					</Text>
 					<BsQuestionCircle fontSize="13px" m="0" />
 				</Flex>
 				<Link to="/teacher/courses/create">
@@ -275,60 +278,75 @@ const Offers = () => {
 																	</Tag>
 																</Td>
 																<Td>
-																	<Flex gap="5">
-																		<FiEye />
-																		<FiBarChart />
-																		<Popover placement="left">
-																			<PopoverTrigger>
-																				<Text cursor="pointer">
+																	<Flex>
+																		<Menu>
+																			<MenuButton
+																				size="sm"
+																				as={
+																					IconButton
+																				}
+																				icon={
+																					<FiEye />
+																				}
+																				variant="ghost"
+																			/>
+																		</Menu>
+																		<Menu>
+																			<MenuButton
+																				size="sm"
+																				as={
+																					IconButton
+																				}
+																				icon={
+																					<FiBarChart />
+																				}
+																				variant="ghost"
+																			/>
+																		</Menu>
+																		<Menu>
+																			<MenuButton
+																				size="sm"
+																				as={
+																					IconButton
+																				}
+																				icon={
 																					<FiMoreHorizontal />
-																				</Text>
-																			</PopoverTrigger>
-																			<PopoverContent w="fit-content">
-																				<PopoverBody>
-																					<VStack
-																						align="left"
-																						justify="left"
-																					>
-																						<Button
-																							leftIcon={
-																								<FiEye />
-																							}
-																							variant="ghost"
-																						>
-																							Preview
-																						</Button>
-																						<Button
-																							leftIcon={
-																								<FiCopy />
-																							}
-																							variant="ghost"
-																						>
-																							Duplicate
-																						</Button>
-																						<Button
-																							leftIcon={
-																								<FiBarChart />
-																							}
-																							variant="ghost"
-																						>
-																							Stats
-																						</Button>
-																					</VStack>
-																				</PopoverBody>
-																				<PopoverFooter>
-																					<Button
-																						leftIcon={
-																							<FiXCircle />
-																						}
-																						variant="ghost"
-																						colorScheme="red"
-																					>
-																						Delete
-																					</Button>
-																				</PopoverFooter>
-																			</PopoverContent>
-																		</Popover>
+																				}
+																				variant="ghost"
+																			/>
+																			<MenuList>
+																				<MenuItem
+																					icon={
+																						<FiEye />
+																					}
+																				>
+																					Preview
+																				</MenuItem>
+																				<MenuItem
+																					icon={
+																						<FiCopy />
+																					}
+																				>
+																					Duplicate
+																				</MenuItem>
+																				<MenuItem
+																					icon={
+																						<FiBarChart />
+																					}
+																				>
+																					Stats
+																				</MenuItem>
+																				<Divider />
+																				<MenuItem
+																					color="red"
+																					icon={
+																						<FiXCircle color="red" />
+																					}
+																				>
+																					Delete
+																				</MenuItem>
+																			</MenuList>
+																		</Menu>
 																	</Flex>
 																</Td>
 															</Tr>
@@ -455,60 +473,75 @@ const Offers = () => {
 																	</Tag>
 																</Td>
 																<Td>
-																	<Flex gap="5">
-																		<FiEye />
-																		<FiBarChart />
-																		<Popover placement="left">
-																			<PopoverTrigger>
-																				<Text cursor="pointer">
+																	<Flex>
+																		<Menu>
+																			<MenuButton
+																				size="sm"
+																				as={
+																					IconButton
+																				}
+																				icon={
+																					<FiEye />
+																				}
+																				variant="ghost"
+																			/>
+																		</Menu>
+																		<Menu>
+																			<MenuButton
+																				size="sm"
+																				as={
+																					IconButton
+																				}
+																				icon={
+																					<FiBarChart />
+																				}
+																				variant="ghost"
+																			/>
+																		</Menu>
+																		<Menu>
+																			<MenuButton
+																				size="sm"
+																				as={
+																					IconButton
+																				}
+																				icon={
 																					<FiMoreHorizontal />
-																				</Text>
-																			</PopoverTrigger>
-																			<PopoverContent w="fit-content">
-																				<PopoverBody>
-																					<VStack
-																						align="left"
-																						justify="left"
-																					>
-																						<Button
-																							leftIcon={
-																								<FiEye />
-																							}
-																							variant="ghost"
-																						>
-																							Preview
-																						</Button>
-																						<Button
-																							leftIcon={
-																								<FiCopy />
-																							}
-																							variant="ghost"
-																						>
-																							Duplicate
-																						</Button>
-																						<Button
-																							leftIcon={
-																								<FiBarChart />
-																							}
-																							variant="ghost"
-																						>
-																							Stats
-																						</Button>
-																					</VStack>
-																				</PopoverBody>
-																				<PopoverFooter>
-																					<Button
-																						leftIcon={
-																							<FiXCircle />
-																						}
-																						variant="ghost"
-																						colorScheme="red"
-																					>
-																						Delete
-																					</Button>
-																				</PopoverFooter>
-																			</PopoverContent>
-																		</Popover>
+																				}
+																				variant="ghost"
+																			/>
+																			<MenuList>
+																				<MenuItem
+																					icon={
+																						<FiEye />
+																					}
+																				>
+																					Preview
+																				</MenuItem>
+																				<MenuItem
+																					icon={
+																						<FiCopy />
+																					}
+																				>
+																					Duplicate
+																				</MenuItem>
+																				<MenuItem
+																					icon={
+																						<FiBarChart />
+																					}
+																				>
+																					Stats
+																				</MenuItem>
+																				<Divider />
+																				<MenuItem
+																					color="red"
+																					icon={
+																						<FiXCircle color="red" />
+																					}
+																				>
+																					Delete
+																				</MenuItem>
+																			</MenuList>
+																		</Menu>
 																	</Flex>
 																</Td>
 															</Tr>
@@ -631,60 +664,75 @@ const Offers = () => {
 																</Tag>
 															</Td>
 															<Td>
-																<Flex gap="5">
-																	<FiEye />
-																	<FiBarChart />
-																	<Popover placement="left">
-																		<PopoverTrigger>
-																			<Text cursor="pointer">
+																<Flex>
+																	<Menu>
+																		<MenuButton
+																			size="sm"
+																			as={
+																				IconButton
+																			}
+																			icon={
+																				<FiEye />
+																			}
+																			variant="ghost"
+																		/>
+																	</Menu>
+																	<Menu>
+																		<MenuButton
+																			size="sm"
+																			as={
+																				IconButton
+																			}
+																			icon={
+																				<FiBarChart />
+																			}
+																			variant="ghost"
+																		/>
+																	</Menu>
+																	<Menu>
+																		<MenuButton
+																			size="sm"
+																			as={
+																				IconButton
+																			}
+																			icon={
 																				<FiMoreHorizontal />
-																			</Text>
-																		</PopoverTrigger>
-																		<PopoverContent w="fit-content">
-																			<PopoverBody>
-																				<VStack
-																					align="left"
-																					justify="left"
-																				>
-																					<Button
-																						leftIcon={
-																							<FiEye />
-																						}
-																						variant="ghost"
-																					>
-																						Preview
-																					</Button>
-																					<Button
-																						leftIcon={
-																							<FiCopy />
-																						}
-																						variant="ghost"
-																					>
-																						Duplicate
-																					</Button>
-																					<Button
-																						leftIcon={
-																							<FiBarChart />
-																						}
-																						variant="ghost"
-																					>
-																						Stats
-																					</Button>
-																				</VStack>
-																			</PopoverBody>
-																			<PopoverFooter>
-																				<Button
-																					leftIcon={
-																						<FiXCircle />
-																					}
-																					variant="ghost"
-																					colorScheme="red"
-																				>
-																					Delete
-																				</Button>
-																			</PopoverFooter>
-																		</PopoverContent>
-																	</Popover>
+																			}
+																			variant="ghost"
+																		/>
+																		<MenuList>
+																			<MenuItem
+																				icon={
+																					<FiEye />
+																				}
+																			>
+																				Preview
+																			</MenuItem>
+																			<MenuItem
+																				icon={
+																					<FiCopy />
+																				}
+																			>
+																				Duplicate
+																			</MenuItem>
+																			<MenuItem
+																				icon={
+																					<FiBarChart />
+																				}
+																			>
+																				Stats
+																			</MenuItem>
+																			<Divider />
+																			<MenuItem
+																				color="red"
+																				icon={
+																					<FiXCircle color="red" />
+																				}
+																			>
+																				Delete
+																			</MenuItem>
+																		</MenuList>
+																	</Menu>
 																</Flex>
 															</Td>
 														</Tr>
@@ -700,6 +748,20 @@ const Offers = () => {
 						</TabPanel>
 					</TabPanels>
 				</Tabs>
+				<Flex justify="space-between" align="center" p="5">
+					<Text>
+						<b>1</b> Offers
+					</Text>
+
+					<Flex gap="5" align="center">
+						<FiChevronLeft fontSize="20px" cursor="pointer" />
+						<Link>1</Link>
+						<FiChevronRight
+							fontSize="20px"
+							cursor="pointer"
+						/>
+					</Flex>
+				</Flex>
 			</Card>
 		</>
 	);

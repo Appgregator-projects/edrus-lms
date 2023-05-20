@@ -37,6 +37,10 @@ import NewOffer from "../pages/teachers/Dashboard/Sales/Offer/NewOffer";
 import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNewOffer";
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
 import EditOfferPage from "../pages/teachers/Dashboard/Sales/Offer/EditOffer";
+import CouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/Coupons";
+import BannerNewCouponPage from "../pages/teachers/Dashboard/Sales/Coupons/BannerNewCoupon";
+import NewCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/NewCoupons";
+import EditCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/EditCoupons";
 
 const Routers = () => {
 	return (
@@ -140,6 +144,20 @@ const Routers = () => {
 			<Route
 				path="/teacher/offers/:id/edit"
 				element={<EditOfferPage />}
+			/>
+			<Route path="/teacher/coupons" element={<CouponsPage />} />
+			<Route
+				path="/teacher/coupons/new"
+				element={<NewCouponsPage />}
+			/>
+
+			<Route
+				path="/teacher/coupons/new/banner"
+				element={<BannerNewCouponPage />}
+			/>
+			<Route
+				path="/teacher/coupons/:id/edit"
+				element={<EditCouponsPage />}
 			/>
 		</Routes>
 	);
