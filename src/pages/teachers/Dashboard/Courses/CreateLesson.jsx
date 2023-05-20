@@ -42,11 +42,13 @@ import 'react-quill/dist/quill.snow.css';
 import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
 import { UseAuthState } from '../../../../context/Context';
 import ReactPlayer from 'react-player';
+import { ChevronLeftIcon } from '@chakra-ui/icons';
 
 
 function CreateLesson() {
 	const [data, setData] = useState()
 	const [loading, setLoading] = useState(false)
+	const [description, setDescription] = useState("")
 	const [modalData, setModalData] = useState({ key: 0, type: 0, format: 0 })
 
 	const { id, lessonId } = useParams();
@@ -65,6 +67,9 @@ function CreateLesson() {
 			data.id = lessonId
 			console.log(data)
 			setData(data)
+			if (data.description)
+				setDescription(data.description)
+
 		} else {
 			console.log("No such document!");
 		}
@@ -179,7 +184,6 @@ function CreateLesson() {
 				}
 			},
 			(error) => {
-				// Handle unsuccessful uploads
 				console.log(error.message)
 			},
 			() => {
@@ -191,7 +195,7 @@ function CreateLesson() {
 							[modalData.key]: downloadURL,
 							[`${modalData.key}_type`]: modalData.type
 						}
-						setData({ ...data, updateData })
+						setData(updateData)
 						return updateData
 					})
 					.then((data) => {
@@ -205,8 +209,19 @@ function CreateLesson() {
 
 	const handleSave = async () => {
 		const ref = doc(db, `courses/${id}/lesson`, lessonId);
-		setDoc(ref, { ...data, lastUpdated: new Date() }, { merge: true });
+		setDoc(ref, {
+			...data,
+			lastUpdated: new Date(),
+			description: description
+		},
+			{ merge: true });
 		navigate(-1)
+	}
+
+	const getFileName = (data) => {
+		let newData = data.split('?')
+		newData = newData[0].split('%2F')
+		return newData[newData.length - 1]
 	}
 
 
@@ -220,6 +235,10 @@ function CreateLesson() {
 		<Sidebar>
 			<Box>
 				<HStack>
+					<HStack color="#2c698d" fontSize="14px" onClick={() => navigate(-1)}>
+						<ChevronLeftIcon />
+						<Text>Back</Text>
+					</HStack>
 					<Heading>{data?.title ? data.title : <></>}</Heading>
 					<Spacer />
 					<Button onClick={() => console.log(data, modalData, loading)}>Check Console</Button>
@@ -253,10 +272,10 @@ function CreateLesson() {
 							</Box>
 
 							<Box borderRadius='md' border='1px' borderColor='gray' p='2' mr='2' ml='2'>
-								{/* <ReactQuill theme="snow"
-									value={data?.description ? data.description : ''}
-									onChange={(e) => setData({ ...data, description: e })}
-								/> */}
+								<ReactQuill theme="snow"
+									value={description}
+									onChange={(e) => setDescription(e)}
+								/>
 							</Box>
 
 
@@ -271,9 +290,15 @@ function CreateLesson() {
 								{data?.download ?
 									<Box borderBottom='1px' borderColor='gray.50'>
 										<HStack>
-											<Text>{data.download}</Text>
+											<Text>{getFileName(data.download)}</Text>
 											<Spacer />
-											<FiDownload />
+											<a
+												href={data.download}
+												download
+												target="_blank" rel="noreferrer"
+											>
+												<FiDownload />
+											</a>
 											<FiDelete />
 										</HStack>
 									</Box>
@@ -283,10 +308,9 @@ function CreateLesson() {
 
 								}
 							</Box>
-
-
 						</Box>
 					</Box>
+
 					<Box width='30%'>
 						<Box borderRadius='md' shadow='base' p='2' m='1'>
 							<Heading fontSize='md'>Status</Heading>
@@ -305,6 +329,7 @@ function CreateLesson() {
 								</Stack>
 							</RadioGroup>
 						</Box>
+
 						<Box borderRadius='md' shadow='base' p='2' m='1'>
 							<Heading fontSize='md'>Thumbnail</Heading>
 							<Image borderRadius='md' border='1px' borderColor='gray' src={data?.thumbnail ? data.thumbnail : 'https://kajabi-app-assets.kajabi-cdn.com/assets/upload_image_placeholder-8156b59904f2c4ffaa4e045f09ee36f73ac4ca59b7232da5cd0d66c95ac53739.png'} alt='Dan Abramov' />
@@ -317,6 +342,7 @@ function CreateLesson() {
 								<Button onClick={() => handleModal('image', 'thumbnail')}>Upload</Button>
 							</HStack>
 						</Box>
+
 						<Box borderRadius='md' shadow='base' p='2' m='1'>
 							<Heading fontSize='md'>Comment</Heading>
 							<RadioGroup>

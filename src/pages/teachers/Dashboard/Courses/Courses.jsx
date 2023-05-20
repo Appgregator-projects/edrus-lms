@@ -151,7 +151,12 @@ const Courses = () => {
 					courses.map((x) =>
 						<HStack justify="space-between" shadow='base' p='2' m='2'>
 							<Flex gap="2" align="center">
-								<Image boxSize='100px' src='https://bit.ly/dan-abramov' alt='Dan Abramov' />
+								{x?.image ?
+									<Image width='100px' src={x.image} alt='image' />
+
+									:
+									<Image width='100px' src='https://kajabi-app-assets.kajabi-cdn.com/assets/upload_image_placeholder-8156b59904f2c4ffaa4e045f09ee36f73ac4ca59b7232da5cd0d66c95ac53739.png' alt='image' />
+								}
 								<Flex flexDir="column">
 									<Link to={`${x.id}`}>
 										<Heading fontWeight="bold">{x.data.title}</Heading>
