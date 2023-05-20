@@ -31,6 +31,9 @@ import {
 } from "react-icons/bs";
 
 import { useNavigate } from "react-router-dom";
+import { UseAuthDispatch } from "../../context/Context";
+import { signOut } from "firebase/auth";
+import { authFirebase } from "../../config/firebase";
 interface LinkItemProps {
 	name: string;
 	icon: IconType;
@@ -88,21 +91,21 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 	const dispatch = UseAuthDispatch()
 
 	const _logout = async () => {
-		dispatch({ type : "INIT_START"})
+		dispatch({ type: "INIT_START" })
 		console.log("logging out")
 		signOut(authFirebase).then(() => {
-		  // Sign-out successful.
-		  navigate('/');
-		  localStorage.removeItem('user')
-		  dispatch({ type : "LOGOUT_SUCCESS"})
-	
+			// Sign-out successful.
+			navigate('/');
+			localStorage.removeItem('user')
+			dispatch({ type: "LOGOUT_SUCCESS" })
+
 		}).catch((error) => {
-		  // An error happened.
-		  alert(error.message)
-		}).finally(()=>{
-		  dispatch({type : "INIT_FINISH"})
+			// An error happened.
+			alert(error.message)
+		}).finally(() => {
+			dispatch({ type: "INIT_FINISH" })
 		})
-	  };
+	};
 
 
 	return (
@@ -147,12 +150,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 				</NavItem>
 			))}
 			<NavItem
-					
-					icon={BsDoorOpenFill}
-					onClick={() =>_logout()}
-				>
-					Logout
-				</NavItem>
+
+				icon={BsDoorOpenFill}
+				onClick={() => _logout()}
+			>
+				Logout
+			</NavItem>
 		</Box>
 	);
 };

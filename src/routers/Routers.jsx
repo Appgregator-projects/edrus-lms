@@ -37,6 +37,11 @@ import NewOffer from "../pages/teachers/Dashboard/Sales/Offer/NewOffer";
 import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNewOffer";
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
 import EditOfferPage from "../pages/teachers/Dashboard/Sales/Offer/EditOffer";
+import { UseAuthState } from "../context/Context";
+import ProtectedRoute from "./ProtectedRoute";
+import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
+import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
+import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";
 
 const Routers = () => {
 	const { user } = UseAuthState();
@@ -204,7 +209,34 @@ const Routers = () => {
 				</ProtectedRoute>
 			} />
 			{/* ======================================================================== */}
+			<Route path="/teacher/customers" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CustomersPage />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/customers/tags" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CustomersTagsPage />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/customers/:id" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CustomersSinglePage />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/courses/:id/lesson/:lessonId" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CreateLesson />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/courses/edit" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<EditCoursesPage />
+				</ProtectedRoute>
+			} />
 
+
+			{/* ======================================================================== */}
 
 			{/* course - section - lesson */}
 			<Route path="/teacher/sections" element={
@@ -263,6 +295,7 @@ const Routers = () => {
 				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<AssignmentPage />
 				</ProtectedRoute>
+			} />
 
 			<Route path="/teacher/assignment" element={<AssignmentPage />} />
 			<Route path="/teacher/offers/new" element={<NewOffer />} />
