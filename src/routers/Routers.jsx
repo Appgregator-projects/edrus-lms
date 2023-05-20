@@ -42,6 +42,7 @@ import BannerNewCouponPage from "../pages/teachers/Dashboard/Sales/Coupons/Banne
 import NewCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/NewCoupons";
 import EditCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/EditCoupons";
 import BannerNewPaymentPage from "../pages/teachers/Dashboard/Sales/Payments/BannerNewPayment";
+import AffiliatesPage from "../pages/teachers/Dashboard/Sales/Affiliates/Affiliates";
 
 const Routers = () => {
 	return (
@@ -164,6 +165,7 @@ const Routers = () => {
 				path="/teacher/payments/new/banner"
 				element={<BannerNewPaymentPage />}
 			/>
+			<Route path="/teacher/affiliates" element={<AffiliatesPage />} />
 		</Routes>
 	);
 };

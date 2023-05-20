@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import {
 	IconButton,
 	Box,
@@ -20,6 +20,7 @@ import {
 	PopoverArrow,
 	PopoverBody,
 	Circle,
+	Button,
 } from "@chakra-ui/react";
 import { FiHome, FiMenu, FiSettings, FiUsers } from "react-icons/fi";
 import { IconType } from "react-icons";
@@ -30,7 +31,7 @@ import {
 	BsEnvelope,
 } from "react-icons/bs";
 
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 interface LinkItemProps {
 	name: string;
 	icon: IconType;
@@ -42,7 +43,7 @@ const LinkItems: Array<LinkItemProps> = [
 	// { name: 'Lessons', icon: RiFileList2Line, link: '/teacher/lessons' },
 	// { name: 'Assignment', icon: FaTasks, link: '/teacher/assignment' },
 	// { name: 'Quiz', icon: BsFileCheck, link: '/teacher/quiz' },
-	{ name: "Sales", icon: BsFileCheck, link: "/teacher/offers/new/banner" },
+	{ name: "Sales", icon: BsFileCheck, link: "#" },
 	{ name: "People", icon: FiUsers, link: "/teacher/quiz" },
 	{ name: "Setting", icon: FiSettings, link: "/teacher/quiz" },
 
@@ -85,6 +86,19 @@ interface SidebarProps extends BoxProps {
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 	const navigate = useNavigate();
+	const location = useLocation();
+	console.log(location, "ni location");
+	const [sales, setSales] = useState(location.pathname);
+	console.log(sales, "ni sales");
+	const salesItem = [
+		{ name: "Offers", link: "/teacher/offers/new/banner" },
+		{ name: "Coupons", link: "/teacher/coupons/new/banner" },
+		{ name: "Payments", link: "/teacher/payments/new/banner" },
+	];
+	const handleClick = (params) => {
+		navigate(params);
+		setSales(location.pathname);
+	};
 	return (
 		<Box
 			transition="3s ease"
@@ -118,13 +132,35 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 				/>
 			</Flex>
 			{LinkItems.map((link) => (
-				<NavItem
-					key={link.name}
-					icon={link.icon}
-					onClick={() => navigate(`${link.link}`)}
-				>
-					{link.name}
-				</NavItem>
+				<>
+					<NavItem
+						key={link.name}
+						icon={link.icon}
+						onClick={() => {
+							link.name === "Sales"
+								? setSales("Sales")
+								: handleClick(link.link);
+						}}
+					>
+						{link.name}
+					</NavItem>
+					{sales === "Sales" && link.name === "Sales" ? (
+						salesItem.map((item) => (
+							<>
+								<NavItem
+									key={item.name}
+									onClick={() => {
+										navigate(`${item.link}`);
+									}}
+								>
+									{item.name}
+								</NavItem>
+							</>
+						))
+					) : (
+						<></>
+					)}
+				</>
 			))}
 		</Box>
 	);
