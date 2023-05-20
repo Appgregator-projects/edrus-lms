@@ -224,7 +224,7 @@ const NewOffer = () => {
 									w="100%"
 									onClick={() =>
 										navigate(
-											"/teacher/setting/offers/1234/edit"
+											"/teacher/offers/1234/edit"
 										)
 									}
 								>

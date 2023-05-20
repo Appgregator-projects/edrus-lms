@@ -138,7 +138,7 @@ const Routers = () => {
 			/>
 
 			<Route
-				path="/teacher/setting/offers/:id/edit"
+				path="/teacher/offers/:id/edit"
 				element={<EditOfferPage />}
 			/>
 		</Routes>
