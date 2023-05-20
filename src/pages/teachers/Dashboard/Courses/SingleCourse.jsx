@@ -59,6 +59,7 @@ const SingleCourse = () => {
 	const [lessonTitle, setLessonTitle] = useState([])
 	const [modalFor, setModalFor] = useState('')
 	const [sectionOnEdit, setSectionOnEdit] = useState('')
+	const [loading, setLoading] = useState(false)
 
 	const getCourseDetail = async () => {
 		const unsub = onSnapshot(doc(db, "courses", id), (doc) => {
@@ -76,17 +77,19 @@ const SingleCourse = () => {
 	}
 
 	const handleAddLesson = async () => {
+		setLoading(true)
 		const section = sectionOnEdit
 		//ADD NEW LESSON FIRST AND GET THE ID
-		const docRef = await addDoc(collection(db, `courses/${id}/lesson`), { title: lessonTitle });
+		const docRef = await addDoc(collection(db, `courses/${id}/lesson`), { title: lessonTitle, status: 'draft', comment: 'hidden' });
 		const lessonId = docRef.id;
 
 		//insert array union to courses db
 		const course = doc(db, "courses", id);
-		const result = await updateDoc(course, {
+		await updateDoc(course, {
 			lessons: arrayUnion({ id: lessonId, title: lessonTitle, section: section })
 		});
-		console.log(result)
+		setLoading(false)
+
 		onClose()
 	}
 
@@ -136,7 +139,7 @@ const SingleCourse = () => {
 						</Box>
 						<Spacer />
 						<Center>
-							<Button colorScheme='blue' onClick={()=>handleOpenMmodal('section')}>Add Section</Button>
+							<Button colorScheme='blue' onClick={() => handleOpenMmodal('section')}>Add Section</Button>
 						</Center>
 					</Flex>
 				</Box>
@@ -163,18 +166,21 @@ const SingleCourse = () => {
 										<HStack>
 											<Heading fontSize='md' pl='5'>Lessons</Heading>
 											<Spacer />
-											<Button size='xs' colorScheme='green' 
-											onClick={() => handleOpenMmodal('lesson', x.title)}
+											<Button size='xs' colorScheme='green'
+												onClick={() => handleOpenMmodal('lesson', x.title)}
 											// onClick={() => handleAddLesson(x.title)}
 											>Add Lesson</Button>
 										</HStack>
 										{getLessons(x.title) ? getLessons(x.title).map((z) =>
 											<Box borderBottom='1px' pl='10' mb='2' borderColor='gray.50'>
 												<HStack>
-													<Icon as={FiBookOpen} />
+													<Icon as={z.media ? FiVideo : FiBookOpen} />
 													<Box>
-														<Text m='0' >{z.title}</Text>
-														<Text m='0' fontSize='3xs'>ID: {z.id}</Text>
+														<Link to={`lesson/${z.id}`}>
+															<Text m='0' >{z.title}</Text>
+															<Text m='0' fontSize='3xs'>ID: {z.id}</Text>
+														</Link>
+
 													</Box>
 													<Spacer />
 													<Icon as={FiEye} />
@@ -185,7 +191,10 @@ const SingleCourse = () => {
 
 													<Icon as={FiMessageCircle} />
 													{/* <Button size='xs' colorScheme='blue' onClick={() => console.log('add content')}>Add Content</Button> */}
-													<Badge colorScheme='green'>Published</Badge>
+													{z.status ? <Badge colorScheme='green'>published</Badge>
+														:
+														<Badge colorScheme='red'>draft</Badge>
+													}
 												</HStack>
 											</Box>
 										)
@@ -211,20 +220,26 @@ const SingleCourse = () => {
 					<ModalHeader>Add {modalFor}</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-						{modalFor === "section" ? <Input type='text' placeholder='Insert section title' onChange={(e) => setSectionTitle(e.target.value)} /> : 
-												<Input type='text' placeholder='Insert lesson title' onChange={(e) => setLessonTitle(e.target.value)} />}
+						{modalFor === "section" ? <Input type='text' placeholder='Insert section title' onChange={(e) => setSectionTitle(e.target.value)} /> :
+							<Input type='text' placeholder='Insert lesson title' onChange={(e) => setLessonTitle(e.target.value)} />}
 
 					</ModalBody>
 
 					<ModalFooter>
-						{/* <Button colorScheme='blue' mr={3} onClick={onClose}>
-							Close
-						</Button> */}
-						{modalFor === "section" ? 
-						<Button colorScheme='green' onClick={() => handleAddSection()}>Add Section</Button> : 
-						<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
+
+						{modalFor === "section" ?
+							<Button colorScheme='green' onClick={() => handleAddSection()}>Add Section</Button>
+							:
+							loading ?
+								<Button
+									isLoading
+									loadingText='Submitting'
+									colorScheme='green'
+								>Add Lesson</Button>
+								:
+								<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
 						}
-						
+
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

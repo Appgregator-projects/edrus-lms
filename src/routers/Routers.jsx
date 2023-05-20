@@ -42,6 +42,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
 import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
 import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";
+import SettingPage from "../pages/teachers/Dashboard/Settings/SettingPage";
 
 const Routers = () => {
 	const { user } = UseAuthState();
@@ -224,17 +225,23 @@ const Routers = () => {
 					<CustomersSinglePage />
 				</ProtectedRoute>
 			} />
-			<Route path="/teacher/courses/:id/lesson/:lessonId" element={
-				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
-					<CreateLesson />
-				</ProtectedRoute>
-			} />
-			<Route path="/teacher/courses/edit" element={
-				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
-					<EditCoursesPage />
-				</ProtectedRoute>
-			} />
 
+			{/* ======================================================================== */}
+			<Route path="/teacher/settings" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<SettingPage />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/customers/tags" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CustomersTagsPage />
+				</ProtectedRoute>
+			} />
+			<Route path="/teacher/customers/:id" element={
+				<ProtectedRoute user={user?.role === 'teacher'} redirectPath='/'>
+					<CustomersSinglePage />
+				</ProtectedRoute>
+			} />
 
 			{/* ======================================================================== */}
 
