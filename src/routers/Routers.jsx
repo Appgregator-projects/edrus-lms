@@ -41,6 +41,7 @@ import CouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/Coupons";
 import BannerNewCouponPage from "../pages/teachers/Dashboard/Sales/Coupons/BannerNewCoupon";
 import NewCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/NewCoupons";
 import EditCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/EditCoupons";
+import BannerNewPaymentPage from "../pages/teachers/Dashboard/Sales/Payments/BannerNewPayment";
 
 const Routers = () => {
 	return (
@@ -158,6 +159,10 @@ const Routers = () => {
 			<Route
 				path="/teacher/coupons/:id/edit"
 				element={<EditCouponsPage />}
+			/>
+			<Route
+				path="/teacher/payments/new/banner"
+				element={<BannerNewPaymentPage />}
 			/>
 		</Routes>
 	);
