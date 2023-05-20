@@ -9,7 +9,7 @@ import {
 	Switch,
 	Text,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import { FiTag } from "react-icons/fi";
 
 const CommisionSetup = () => {

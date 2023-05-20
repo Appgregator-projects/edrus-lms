@@ -43,19 +43,50 @@ import NewCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/NewCoupons
 import EditCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/EditCoupons";
 import BannerNewPaymentPage from "../pages/teachers/Dashboard/Sales/Payments/BannerNewPayment";
 import AffiliatesPage from "../pages/teachers/Dashboard/Sales/Affiliates/Affiliates";
-
+import { UseAuthState } from "../context/Context";
+import ProtectedRoute from "./ProtectedRoute";
+import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
+import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
+import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";
+import SettingPage from "../pages/teachers/Dashboard/Settings/SettingPage";
+import SiteDetailsPage from "../pages/teachers/Dashboard/Settings/Component/SiteDetails";
+import DripSettings from "../pages/teachers/Dashboard/Settings/Component/DripSettings";
+import DripSettingsPage from "../pages/teachers/Dashboard/Settings/Component/DripSettings";
+import DomainSettingPage from "../pages/teachers/Dashboard/Settings/Component/DomainSetting";
+import DNSSettingPages from "../pages/teachers/Dashboard/Settings/Component/DNSSetting";
 const Routers = () => {
+	const { user } = UseAuthState();
 	return (
 		<Routes>
-			<Route exact path="/" element={<Homepage />} />
-			<Route path="/courses" element={<Courses />} />
+			<Route
+				exact
+				path="/"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<Homepage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/courses"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<Courses />
+					</ProtectedRoute>
+				}
+			/>
 			<Route path="/login" element={<Signin />} />
 			<Route path="/signup" element={<Signup />} />
 
 			<Route
 				path="/courses/:course_id"
-				element={<CoursesStructurePage />}
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<CoursesStructurePage />
+					</ProtectedRoute>
+				}
 			/>
+
 			<Route
 				path="/courses/:course_id/lesson/:lesson_id"
 				element={<CoursesStructurePage />}
@@ -74,60 +105,398 @@ const Routers = () => {
 			/>
 			<Route path="/topics/:title" element={<TopicsPage />} />
 
-			<Route path="/profile" element={<Profile />} />
-			<Route path="/profile/:id" element={<ProfileUser />} />
-			<Route path="/inbox" element={<Inbox />} />
-			<Route path="/news" element={<DailyNews />} />
-			<Route path="/people" element={<People />} />
-			<Route path="/profile/edit" element={<EditProfile />} />
-			<Route path="/account" element={<Account />} />
+			<Route
+				path="/courses/:course_id/sections/:section_id"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<TopicsPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/courses/:course_id/sections/:section_id/lesson/:lesson_id"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<LessonPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/courseStructure"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<CoursesStructurePage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/topics/:title"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<TopicsPage />
+					</ProtectedRoute>
+				}
+			/>
 
-			<Route path="/teacher/login" element={<SigninTeacher />} />
-			<Route path="teacher/signup" element={<SignupTeacher />} />
-			<Route path="/teacher/dashboard" element={<DashboardPage />} />
+			<Route
+				path="/profile"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<Profile />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/profile/:id"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<ProfileUser />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/inbox"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<Inbox />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/news"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<DailyNews />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/people"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<People />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/profile/edit"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<EditProfile />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/account"
+				element={
+					<ProtectedRoute user={user} redirectPath="/login">
+						<Account />
+					</ProtectedRoute>
+				}
+			/>
 
-			<Route path="/teacher/courses" element={<CoursesPages />} />
+			<Route
+				path="/teacher/dashboard"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<DashboardPage />
+					</ProtectedRoute>
+				}
+			/>
+
+			<Route
+				path="/teacher/courses"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CoursesPages />
+					</ProtectedRoute>
+				}
+			/>
 			<Route
 				path="/teacher/courses/create"
-				element={<CreateCoursesPage />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreateCoursesPage />
+					</ProtectedRoute>
+				}
 			/>
 			<Route
 				path="/teacher/courses/:id"
-				element={<SingleCoursePage />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<SingleCoursePage />
+					</ProtectedRoute>
+				}
 			/>
 			<Route
 				path="/teacher/courses/:id/lesson/:lessonId"
-				element={<CreateLesson />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreateLesson />
+					</ProtectedRoute>
+				}
 			/>
 			<Route
 				path="/teacher/courses/edit"
-				element={<EditCoursesPage />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<EditCoursesPage />
+					</ProtectedRoute>
+				}
 			/>
 
+			{/* ======================================================================== */}
+			<Route path="/teacher/login" element={<SigninTeacher />} />
+			<Route path="teacher/signup" element={<SignupTeacher />} />
+			<Route
+				path="/teacher/courses"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CoursesPages />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/courses/create"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreateCoursesPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/courses/:id"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<SingleCoursePage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/courses/:id/lesson/:lessonId"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreateLesson />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/courses/edit"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<EditCoursesPage />
+					</ProtectedRoute>
+				}
+			/>
+			{/* ======================================================================== */}
+			<Route
+				path="/teacher/customers"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CustomersPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/customers/tags"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CustomersTagsPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/customers/:id"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CustomersSinglePage />
+					</ProtectedRoute>
+				}
+			/>
+
+			{/* ======================================================================== */}
+			<Route
+				path="/teacher/settings"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<SettingPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/customers/tags"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CustomersTagsPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/customers/:id"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CustomersSinglePage />
+					</ProtectedRoute>
+				}
+			/>
+
+			{/* ======================================================================== */}
+
 			{/* course - section - lesson */}
-			<Route path="/teacher/sections" element={<SectionsPage />} />
+			<Route
+				path="/teacher/sections"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<SectionsPage />
+					</ProtectedRoute>
+				}
+			/>
 			<Route
 				path="/teacher/sections/create"
-				element={<CreateSectionsPage />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreateSectionsPage />
+					</ProtectedRoute>
+				}
 			/>
 			<Route
 				path="/teacher/sections/edit"
-				element={<EditSectionsPage />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<EditSectionsPage />
+					</ProtectedRoute>
+				}
 			/>
 
-			<Route path="/teacher/lessons" element={<Lessons />} />
+			<Route
+				path="/teacher/lessons"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<Lessons />
+					</ProtectedRoute>
+				}
+			/>
 			<Route
 				path="/teacher/lessons/create"
-				element={<CreateLessonsPage />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreateLessonsPage />
+					</ProtectedRoute>
+				}
 			/>
 
-			<Route path="/teacher/users" element={<UserPage />} />
+			<Route
+				path="/teacher/users"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<UserPage />
+					</ProtectedRoute>
+				}
+			/>
 			<Route
 				path="/teacher/users/create"
-				element={<CreateUsersPage />}
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreateUsersPage />
+					</ProtectedRoute>
+				}
 			/>
 
-			<Route path="/teacher/quiz" element={<QuizPage />} />
+			<Route
+				path="/teacher/quiz"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<QuizPage />
+					</ProtectedRoute>
+				}
+			/>
+
+			<Route
+				path="/teacher/assignment"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<AssignmentPage />
+					</ProtectedRoute>
+				}
+			/>
 
 			<Route path="/teacher/assignment" element={<AssignmentPage />} />
 			<Route path="/teacher/offers/new" element={<NewOffer />} />
@@ -166,6 +535,22 @@ const Routers = () => {
 				element={<BannerNewPaymentPage />}
 			/>
 			<Route path="/teacher/affiliates" element={<AffiliatesPage />} />
+			<Route
+				path="/teacher/settings/site-detail"
+				element={<SiteDetailsPage />}
+			/>
+			<Route
+				path="/teacher/settings/drip-setting"
+				element={<DripSettingsPage />}
+			/>
+			<Route
+				path="/teacher/settings/domain"
+				element={<DomainSettingPage />}
+			/>
+			<Route
+				path="/teacher/settings/dns/:id"
+				element={<DNSSettingPages />}
+			/>
 		</Routes>
 	);
 };

@@ -58,6 +58,8 @@ import { BsCircle, BsFileCheck, BsFileText } from 'react-icons/bs';
 import { useState } from 'react';
 import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
+import { UseAuthDispatch, UseAuthState } from '../../../../context/Context';
+import moment from 'moment';
 
 
 const Courses = () => {
@@ -66,10 +68,20 @@ const Courses = () => {
 	const [courses, setCourses] = useState()
 
 	const authentication = { projectId: 'SgCWDWIda9kqrTF80nY9' }
+	const { user, user_uid } = UseAuthState();
+	const dispatch = UseAuthDispatch()
+	const { loading } = UseAuthState()
 
 
 	const getCourses = async () => {
-		const q = query(collection(db, `courses/`), where("project", "==", authentication.projectId, orderBy("lastUpdated"), limit(25)));
+		console.log(user.uid, "uid yang mau diambil")
+		dispatch({
+			type: "INIT_START"
+		})
+		// const q = query(collection(db, `courses/`), where("project", "==", uid, orderBy("lastUpdated"), limit(25)));
+		const q = query(collection(db, "courses"), where("uid", "==", (user.uid === undefined ? user_uid : user.uid))
+			// , orderBy("lastUpdated", "desc"), limit(25)
+		)
 		const querySnapshot = await getDocs(q);
 
 		const sections = []
@@ -80,8 +92,12 @@ const Courses = () => {
 			})
 		});
 		console.log(sections, 'ini data sections')
-		setCourses(sections)
-
+		if (sections) {
+			setCourses(sections)
+			dispatch({
+				type: "INIT_FINISH"
+			})
+		}
 	}
 
 	useEffect(() => {
@@ -135,7 +151,12 @@ const Courses = () => {
 					courses.map((x) =>
 						<HStack justify="space-between" shadow='base' p='2' m='2'>
 							<Flex gap="2" align="center">
-								<Image boxSize='100px' src='https://bit.ly/dan-abramov' alt='Dan Abramov' />
+								{x?.image ?
+									<Image width='100px' src={x.image} alt='image' />
+
+									:
+									<Image width='100px' src='https://kajabi-app-assets.kajabi-cdn.com/assets/upload_image_placeholder-8156b59904f2c4ffaa4e045f09ee36f73ac4ca59b7232da5cd0d66c95ac53739.png' alt='image' />
+								}
 								<Flex flexDir="column">
 									<Link to={`${x.id}`}>
 										<Heading fontWeight="bold">{x.data.title}</Heading>
@@ -152,7 +173,7 @@ const Courses = () => {
 
 										<HStack>
 											<FiCalendar />
-											<Text>{x.data.lastUpdated.seconds}</Text>
+											<Text>{moment.unix(x.data.lastUpdated.seconds).format("DD MMM YYYY hh:mm a")}</Text>
 
 										</HStack>
 									</HStack>
@@ -166,11 +187,14 @@ const Courses = () => {
 							</Flex>
 						</HStack>)
 					:
-					<Center>
-						<Spinner />
-					</Center>
-				}
 
+					loading ? <Center>
+						<Spinner />
+					</Center> :
+						<>
+							<Text>Belum ada course</Text>
+						</>
+				}
 			</Box>
 
 

@@ -32,6 +32,9 @@ import {
 } from "react-icons/bs";
 
 import { useLocation, useNavigate } from "react-router-dom";
+import { UseAuthDispatch } from "../../context/Context";
+import { signOut } from "firebase/auth";
+import { authFirebase } from "../../config/firebase";
 interface LinkItemProps {
 	name: string;
 	icon: IconType;
@@ -44,8 +47,8 @@ const LinkItems: Array<LinkItemProps> = [
 	// { name: 'Assignment', icon: FaTasks, link: '/teacher/assignment' },
 	// { name: 'Quiz', icon: BsFileCheck, link: '/teacher/quiz' },
 	{ name: "Sales", icon: BsFileCheck, link: "#" },
-	{ name: "People", icon: FiUsers, link: "/teacher/quiz" },
-	{ name: "Setting", icon: FiSettings, link: "/teacher/quiz" },
+	{ name: "Customers", icon: FiUsers, link: "/teacher/customers" },
+	{ name: "Setting", icon: FiSettings, link: "/teacher/settings" },
 
 	{ name: "Logout", icon: BsDoorOpenFill, link: "/teacher/login" },
 ];
@@ -99,6 +102,27 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 		navigate(params);
 		setSales(location.pathname);
 	};
+	const dispatch = UseAuthDispatch();
+
+	const _logout = async () => {
+		dispatch({ type: "INIT_START" });
+		console.log("logging out");
+		signOut(authFirebase)
+			.then(() => {
+				// Sign-out successful.
+				navigate("/");
+				localStorage.removeItem("user");
+				dispatch({ type: "LOGOUT_SUCCESS" });
+			})
+			.catch((error) => {
+				// An error happened.
+				alert(error.message);
+			})
+			.finally(() => {
+				dispatch({ type: "INIT_FINISH" });
+			});
+	};
+
 	return (
 		<Box
 			transition="3s ease"
@@ -162,6 +186,9 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 					)}
 				</>
 			))}
+			<NavItem icon={BsDoorOpenFill} onClick={() => _logout()}>
+				Logout
+			</NavItem>
 		</Box>
 	);
 };
