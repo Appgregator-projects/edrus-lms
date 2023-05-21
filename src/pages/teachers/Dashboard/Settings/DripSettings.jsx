@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { FiInfo } from "react-icons/fi";
-import Sidebar from "../../../../../components/teachers/Sidebar";
+import Sidebar from "../../../../components/teachers/Sidebar";
 
 const DripSettings = () => {
 	return (
@@ -57,7 +57,7 @@ const DripSettings = () => {
 								</option>
 							</Select>
 						</Flex>
-						<Checkbox>
+						<Checkbox mt="3">
 							Send an email to customers when product
 							modules are dripped
 						</Checkbox>

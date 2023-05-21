@@ -1,5 +1,5 @@
 import React from "react";
-import Sidebar from "../../../../../components/teachers/Sidebar";
+import Sidebar from "../../../../components/teachers/Sidebar";
 import {
 	Box,
 	Text,
@@ -18,8 +18,8 @@ import {
 	Textarea,
 	Switch,
 } from "@chakra-ui/react";
-import AlertCookies from "../../../../../components/teachers/AlertCookies";
-import DropDrag from "../../../../../components/teachers/DropDrag";
+import AlertCookies from "../../../../components/teachers/AlertCookies";
+import DropDrag from "../../../../components/teachers/DropDrag";
 import { FiInfo } from "react-icons/fi";
 const SiteDetails = () => {
 	return (

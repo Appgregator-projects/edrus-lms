@@ -93,7 +93,7 @@ const Offers = () => {
 					</Text>
 					<BsQuestionCircle fontSize="13px" m="0" />
 				</Flex>
-				<Link to="/teacher/courses/create">
+				<Link to="/teacher/offers/new/banner">
 					<Button colorScheme="green">Add New Offer</Button>
 				</Link>
 			</Flex>

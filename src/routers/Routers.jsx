@@ -49,11 +49,15 @@ import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
 import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
 import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";
 import SettingPage from "../pages/teachers/Dashboard/Settings/SettingPage";
-import SiteDetailsPage from "../pages/teachers/Dashboard/Settings/Component/SiteDetails";
-import DripSettings from "../pages/teachers/Dashboard/Settings/Component/DripSettings";
-import DripSettingsPage from "../pages/teachers/Dashboard/Settings/Component/DripSettings";
-import DomainSettingPage from "../pages/teachers/Dashboard/Settings/Component/DomainSetting";
-import DNSSettingPages from "../pages/teachers/Dashboard/Settings/Component/DNSSetting";
+import SiteDetailsPage from "../pages/teachers/Dashboard/Settings/SiteDetails";
+import DripSettings from "../pages/teachers/Dashboard/Settings/DripSettings";
+import DripSettingsPage from "../pages/teachers/Dashboard/Settings/DripSettings";
+import DomainSettingPage from "../pages/teachers/Dashboard/Settings/Domain/DomainSetting";
+import DNSSettingPages from "../pages/teachers/Dashboard/Settings/Domain/DNSSetting";
+import PaymentPages from "../pages/teachers/Dashboard/Sales/Payments/Payment";
+import AccountDetailsPages from "../pages/teachers/Dashboard/Settings/AccountDetails";
+import AccountUserPages from "../pages/teachers/Dashboard/Settings/AccountUser/AccountUser";
+import NewAccountPages from "../pages/teachers/Dashboard/Settings/AccountUser/NewAccount";
 const Routers = () => {
 	const { user } = UseAuthState();
 	return (
@@ -506,9 +510,9 @@ const Routers = () => {
 				path="/teacher/offers/new/banner"
 				element={<BannerNewOfferPage />}
 			/>
-
+			<Route path="/teacher/payments" element={<PaymentPages />} />
 			<Route
-				path="/teacher/settings/payment"
+				path="/teacher/settings/payments"
 				element={<PaymentPage />}
 			/>
 
@@ -550,6 +554,18 @@ const Routers = () => {
 			<Route
 				path="/teacher/settings/dns/:id"
 				element={<DNSSettingPages />}
+			/>
+			<Route
+				path="/teacher/settings/account-detail"
+				element={<AccountDetailsPages />}
+			/>
+			<Route
+				path="/teacher/settings/account-users"
+				element={<AccountUserPages />}
+			/>
+			<Route
+				path="/teacher/settings/account-users/new"
+				element={<NewAccountPages />}
 			/>
 		</Routes>
 	);

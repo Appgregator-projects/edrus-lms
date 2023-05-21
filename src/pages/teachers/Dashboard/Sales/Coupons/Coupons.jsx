@@ -66,6 +66,7 @@ const Coupons = () => {
 					leftIcon={<AddIcon />}
 					bgColor="black"
 					colorScheme="blackAlpha"
+					onClick={() => navigate("/teacher/coupons/new/banner")}
 				>
 					New Coupon
 				</Button>
@@ -374,7 +375,7 @@ const Coupons = () => {
 
 				<Flex gap="5" align="center">
 					<FiChevronLeft fontSize="20px" cursor="pointer" />
-					<Link>1</Link>
+					<Link>3</Link>
 					<FiChevronRight fontSize="20px" cursor="pointer" />
 				</Flex>
 			</Flex>

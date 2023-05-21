@@ -94,9 +94,9 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 	const [sales, setSales] = useState(location.pathname);
 	console.log(sales, "ni sales");
 	const salesItem = [
-		{ name: "Offers", link: "/teacher/offers/new/banner" },
-		{ name: "Coupons", link: "/teacher/coupons/new/banner" },
-		{ name: "Payments", link: "/teacher/payments/new/banner" },
+		{ name: "Offers", link: "/teacher/offers" },
+		{ name: "Coupons", link: "/teacher/coupons" },
+		{ name: "Payments", link: "/teacher/payments" },
 	];
 	const handleClick = (params) => {
 		navigate(params);
