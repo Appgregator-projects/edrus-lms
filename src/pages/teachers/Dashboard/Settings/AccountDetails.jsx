@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../../../../components/teachers/Sidebar";
 import {
 	Box,
@@ -20,16 +20,103 @@ import {
 	HStack,
 	Avatar,
 	VStack,
+	useToast,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { FiCopy } from "react-icons/fi";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { authFirebase, db, storage } from "../../../../config/firebase";
+import { UseAuthState } from "../../../../context/Context";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 const AccountDetails = () => {
+	// get data, use efffect, onchange
+	// const { uid } = UseAuthState();
+	const [data, setData] = useState({});
+	const currentUser = authFirebase.currentUser;
+	const getData = async () => {
+		const docRef = doc(db, "users", currentUser.uid);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			console.log("Document data:", docSnap.data());
+			const user = docSnap.data();
+			console.log(user);
+			setData(user);
+		} else {
+			// docSnap.data() will be undefined in this case
+			console.log("No such document!");
+		}
+	};
+	const toast = useToast();
+	const updateData = () => {
+		const path = `/user/${currentUser.uid}/profile-pict/${data.image.name}`;
+
+		const storageRef = ref(storage, path);
+		const uploadTask = uploadBytesResumable(storageRef, data.image);
+		uploadTask.on(
+			"state_changed",
+			(snapshot) => {
+				const progress =
+					(snapshot.bytesTransferred / snapshot.totalBytes) *
+					100;
+				console.log("Upload is " + progress + "% done");
+				// if (progress !== 100) setLoading(progress);
+				// else {
+				// 	setLoading(false);
+				// }
+			},
+			(error) => {
+				console.log(error.message);
+			},
+			() => {
+				getDownloadURL(uploadTask.snapshot.ref)
+					.then((downloadURL) => {
+						console.log("File available at", downloadURL);
+
+						setData({
+							...data,
+							image: downloadURL,
+						});
+						return downloadURL;
+					})
+					.then((downloadURL) => {
+						setData({
+							...data,
+							updatedAt: new Date(),
+						});
+						data.image = downloadURL;
+						// update data
+						const ref = doc(db, "users", currentUser.uid);
+						setDoc(ref, data, { merge: true });
+						// setLoading(true);
+						toast({
+							title: "Profile Saved",
+							description: "Your profile has been saved!",
+							status: "success",
+							duration: 9000,
+							isClosable: true,
+						});
+
+						console.log(data, "ni data");
+					});
+			}
+		);
+	};
+	useEffect(() => {
+		getData();
+	}, []);
 	return (
 		<>
 			<Flex align="center" gap="2" my="5" justify="space-between">
 				<Text m="0" fontWeight="semibold" fontSize="30px">
 					Account Details
 				</Text>
+				{/* <Button
+					bgColor="black"
+					colorScheme="blackAlpha"
+					onClick={() => console.log(data)}
+				>
+					consle
+				</Button> */}
 				<Button bgColor="black" colorScheme="blackAlpha">
 					Save
 				</Button>
@@ -46,30 +133,66 @@ const AccountDetails = () => {
 				>
 					<FormControl>
 						<FormLabel>First Name</FormLabel>
-						<Input type="text" />
+						<Input
+							type="text"
+							onChange={(e) =>
+								setData({
+									...data,
+									name: e.target.value,
+								})
+							}
+							value={data.name}
+						/>
 					</FormControl>
 					<FormControl>
 						<FormLabel>Last Name</FormLabel>
-						<Input type="text" />
+						<Input
+							type="text"
+							onChange={(e) =>
+								setData({
+									...data,
+									lName: e.target.value,
+								})
+							}
+							value={data.lName}
+						/>
 					</FormControl>
 					<FormControl>
 						<FormLabel>Account ID</FormLabel>
-						<Input type="number" isDisabled />
+						<Input
+							type="text"
+							isDisabled
+							value={currentUser.uid}
+						/>
 					</FormControl>
 					<FormControl>
 						<FormLabel>Email</FormLabel>
-						<Input type="email" />
+						<Input
+							isDisabled
+							type="email"
+							onChange={(e) =>
+								setData({
+									...data,
+									email: e.target.value,
+								})
+							}
+							value={data.email}
+						/>
 					</FormControl>
 					<FormControl>
 						<FormLabel>Phone Number</FormLabel>
-						<Input type="text" />
+						<Input
+							type="text"
+							onChange={(e) =>
+								setData({
+									...data,
+									phone: e.target.value,
+								})
+							}
+							value={data.phone}
+						/>
 					</FormControl>
-					<FormControl>
-						<FormLabel>Time Zone</FormLabel>
-						<Select>
-							<option>(GMT+07:00) Jakarta</option>
-						</Select>
-					</FormControl>
+
 					<Box
 						border=".0625rem solid #eceeef"
 						p="5"
@@ -78,13 +201,22 @@ const AccountDetails = () => {
 					>
 						<Text fontWeight="semibold">Avatar</Text>
 						<HStack gap="3">
-							<Avatar size="lg" />
+							<Avatar size="lg" src={data.image} />
 							<VStack align="left">
 								<Text m="0">
 									Recommeended dimension{" "}
 									<b>100x100</b>
 								</Text>
-								<Link>Change Avatar</Link>
+								<Input
+									type="file"
+									onChange={(e) =>
+										setData({
+											...data,
+											image: e.target.files[0],
+										})
+									}
+									src={data.image}
+								/>
 							</VStack>
 						</HStack>
 					</Box>
@@ -104,7 +236,17 @@ const AccountDetails = () => {
 				>
 					<FormControl>
 						<FormLabel>Bio</FormLabel>
-						<Textarea h="150px" placeholder="Public bio" />
+						<Textarea
+							h="150px"
+							placeholder="Public bio"
+							onChange={(e) =>
+								setData({
+									...data,
+									bio: e.target.value,
+								})
+							}
+							value={data.bio}
+						/>
 					</FormControl>
 					<FormControl>
 						<FormLabel>Pronoun</FormLabel>
@@ -117,6 +259,13 @@ const AccountDetails = () => {
 						<Input
 							type="text"
 							placeholder="Public Location"
+							onChange={(e) =>
+								setData({
+									...data,
+									location: e.target.value,
+								})
+							}
+							value={data.location}
 						/>
 					</FormControl>
 				</GridItem>
@@ -136,7 +285,7 @@ const AccountDetails = () => {
 							cursor="pointer"
 							align="center"
 						>
-							<Input type="text" w="95%" />
+							<Input type="text" w="95%" disabled />
 							<FiCopy />
 						</Flex>
 					</FormControl>
@@ -147,14 +296,18 @@ const AccountDetails = () => {
 							cursor="pointer"
 							align="center"
 						>
-							<Input type="text" w="95%" />
+							<Input type="text" w="95%" disabled />
 							<FiCopy />
 						</Flex>
 					</FormControl>
 				</GridItem>
 			</Grid>
 			<Flex gap="2" my="5" justify="right">
-				<Button bgColor="black" colorScheme="blackAlpha">
+				<Button
+					bgColor="black"
+					colorScheme="blackAlpha"
+					onClick={() => updateData()}
+				>
 					Save
 				</Button>
 			</Flex>
