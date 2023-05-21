@@ -31,6 +31,9 @@ import {
 } from "react-icons/bs";
 
 import { useNavigate } from "react-router-dom";
+import { UseAuthDispatch } from "../../context/Context";
+import { signOut } from "firebase/auth";
+import { authFirebase } from "../../config/firebase";
 interface LinkItemProps {
 	name: string;
 	icon: IconType;

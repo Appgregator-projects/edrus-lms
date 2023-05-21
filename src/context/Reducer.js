@@ -40,6 +40,18 @@ export const AuthReducer = (initialState, action) => {
         error : null,
         loading : false
       };
+      case 'GET_PROJECT_SUCCESS':
+      return {
+        ...initialState,
+        project_id: action.payload,
+        error : null,
+      };
+      case 'GET_PROJECT_ERROR':
+      return {
+        ...initialState,
+        error : action.payload,
+        loading : false
+      };
     case 'ADD_COURSE':
       return {
         ...initialState,
@@ -48,7 +60,7 @@ export const AuthReducer = (initialState, action) => {
     case 'ADD_PROJECT_SUCCESS':
       return {
         ...initialState,
-        project_id: action.payload.project_id,
+        project_id: [action.payload.project],
         user_uid: action.payload.user_uid
       };
     default:

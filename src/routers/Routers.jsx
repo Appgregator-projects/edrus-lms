@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-
+import ProtectedRoute from '../routers/ProtectedRoute';
 import Courses from "../pages/students/Courses/Courses";
 import CoursesStructurePage from "../pages/students/Courses/CoursesStructurePage";
 import Homepage from "../pages/students/Homepage";
@@ -37,6 +37,7 @@ import NewOffer from "../pages/teachers/Dashboard/Sales/Offer/NewOffer";
 import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNewOffer";
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
 import EditOfferPage from "../pages/teachers/Dashboard/Sales/Offer/EditOffer";
+import { UseAuthState } from "../context/Context";
 
 const Routers = () => {
 	const { user } = UseAuthState();
@@ -263,6 +264,7 @@ const Routers = () => {
 				<ProtectedRoute user={user?.role === "teacher"} redirectPath='/'>
 					<AssignmentPage />
 				</ProtectedRoute>
+			}/>
 
 			<Route path="/teacher/assignment" element={<AssignmentPage />} />
 			<Route path="/teacher/offers/new" element={<NewOffer />} />

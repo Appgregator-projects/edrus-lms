@@ -85,10 +85,17 @@ const Signup = () => {
 				}).then((docRef) => {
 					console.log('document project created with id ', docRef.id)
 					createdProjectUid = docRef.id
-					dispatch({
-						type: "ADD_PROJECT_SUCCESS",
-						payload: { project: docRef.id, user_uid: createdUid }
-					})
+					if (docRef.id) {
+						setTimeout(()=> {
+							dispatch({
+								type: "ADD_PROJECT_SUCCESS",
+								payload: { project: docRef.id, user_uid: createdUid }
+							})
+							console.log("10 detik telah berlalu")
+						}, 10000)
+					} else {
+						console.log("gak mau nunggu")
+					}
 					console.log('project id yang mau dimasukkin ke user document', docRef.id)
 					const docRef2 = doc(db, 'users', createdUid);
 					setDoc(docRef2, { project_id: docRef.id }, { merge: true });

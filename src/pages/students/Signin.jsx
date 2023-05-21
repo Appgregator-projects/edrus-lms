@@ -17,7 +17,7 @@ import React, { useState } from 'react';
 import { authFirebase, db } from '../../config/firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { UseAuthDispatch, UseAuthState } from '../../context/Context';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 
 const Signin = () => {
 	const [email, setEmail] = useState('')
@@ -42,14 +42,24 @@ const Signin = () => {
 			uid = response.user.uid;
 			data = response.user;
 
-			dispatch({ type: "LOGIN_SUCCESS", payload: data })
+			dispatch({
+				type: "LOGIN_SUCCESS", payload: {
+					user: {
+						...response.user,
+						name: response.user.email
+					},
+					user_uid: response.user.uid
+				}
+			})
+
 			console.log(data, "userCredentials")
+			navigate('/')
 		}).catch(e => {
 			alert(e.message)
 		})
 			.finally(() => {
 				dispatch({ type: "INIT_FINISH" })
-				navigate('/')
+
 			})
 
 
@@ -58,17 +68,36 @@ const Signin = () => {
 			const docSnap = await getDoc(docRef);
 
 			if (docSnap) {
-				dispatch({ type: "LOGIN_SUCCESS", payload: {user : docSnap.data(), user_uid : uid} })
+				dispatch({ type: "LOGIN_SUCCESS", payload: { user: docSnap.data(), user_uid: uid } })
 			} else {
 				console.log("Document not found in users collection");
-				dispatch({ type: "LOGIN_SUCCESS", payload: {user :data, user_uid : data.uid} })
+				dispatch({ type: "LOGIN_SUCCESS", payload: { user: data, user_uid: data.uid } })
 			};
+		}
+		async function getProjects() {
+			const citiesRef = collection(db, "projects");
+			const q = query(citiesRef, where("admin", "array-contains", uid));
+			const querySnapshot = uid !== undefined ? await getDocs(q) : []
+			let arr =[]
+			querySnapshot.forEach((doc) => {
+				// doc.data() is never undefined for query doc snapshots
+				arr.push(doc.id)
+			});
+			console.log("asu", arr)
+			dispatch({
+				type : 'GET_PROJECT_SUCCESS',
+				payload : [...arr]
+			})
 		}
 
 		if (uid) {
 			getUserData()
+			getProjects()
 		} else {
-			setTimeout(()=> getUserData(), 2000)
+			setTimeout(() => {
+				getUserData()
+				getProjects()
+			}, 2000)
 		}
 	};
 

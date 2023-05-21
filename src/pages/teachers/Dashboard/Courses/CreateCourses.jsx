@@ -42,7 +42,7 @@ const CreateCourses = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const [courseType, setCourseType] = useState()
 	const { user : { uid }, project_id} = UseAuthState()
-	const authentication = { uid, project: project_id }
+	const authentication = { uid, project: project_id[0] }
 	const [loading, setLoading] = useState(false)
 
 	const product = [

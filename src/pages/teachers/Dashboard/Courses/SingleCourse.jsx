@@ -33,6 +33,7 @@ import {
 	ModalBody,
 	ModalCloseButton,
 	Input,
+	Select,
 } from '@chakra-ui/react';
 import {
 	AddIcon,
@@ -42,9 +43,9 @@ import {
 } from '@chakra-ui/icons';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
-
+import Swal from 'sweetalert2'
 import { db } from '../../../../config/firebase';
-import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, updateDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc } from 'firebase/firestore';
 import { FiBookOpen, FiEdit2, FiEye, FiFolder, FiMessageCircle, FiVideo } from 'react-icons/fi';
 
 
@@ -103,6 +104,38 @@ const SingleCourse = () => {
 		}
 	}
 
+	const handleChangeStatus = async (e) => {
+		console.log(e.target.value)
+		Swal.fire({
+			title: e.target.value === "draft" ? `Save ${data.title} as draft?` : `Publish ${data.title}?`,
+			showDenyButton: true,
+			showCancelButton: false,
+			confirmButtonText: 'Save',
+			denyButtonText: `Don't save`,
+		}).then((result) => {
+			/* Read more about isConfirmed, isDenied below */
+			if (result.isConfirmed) {
+				const docRef = doc(db, 'courses', id);
+
+				setDoc(docRef, { status: e.target.value, lastUpdated: new Date() }, { merge: true })
+					.then(() => {
+						Swal.fire('Saved!', `Success saving ${data.title} as ${e.target.value}`, 'success')
+					})
+					.catch(err => {
+						console.log(err.message)
+						Swal.fire({
+							icon: 'error',
+							title: 'Error',
+							text: err.message,
+						})
+					});
+
+			} else if (result.isDenied) {
+				Swal.fire('Changes are not saved', '', 'info')
+			};
+		})
+	}
+
 	useEffect(() => {
 		getCourseDetail()
 		return () => {
@@ -123,9 +156,21 @@ const SingleCourse = () => {
 					<Flex >
 						<Image boxSize='100px' src='https://bit.ly/dan-abramov' alt='Dan Abramov' />
 						<Box p='2'>
-							<Heading fontWeight="bold" textTransform="capitalize">
-								{data ? data.title : <></>}
-							</Heading>
+							<HStack>
+								<Heading fontWeight="bold" textTransform="capitalize">
+									{data ? data.title : <></>}
+								</Heading>
+								<Badge
+									fontSize={10}
+									colorScheme={
+										data?.status !== undefined && data?.status === "draft" ?
+											"red" : data?.status !== undefined && data?.status === "published" ?
+												"green" : undefined
+									}
+								>
+									{data?.status !== undefined && data?.status}
+								</Badge>
+							</HStack>
 							<HStack>
 								<Text>Overview</Text>
 								<Text>Customize</Text>
@@ -135,8 +180,12 @@ const SingleCourse = () => {
 							</HStack>
 						</Box>
 						<Spacer />
-						<Center>
-							<Button colorScheme='blue' onClick={()=>handleOpenMmodal('section')}>Add Section</Button>
+						<Center gap={2}>
+							<Select onChange={handleChangeStatus} placeholder={data?.status !== undefined ? data?.status : 'Status:' }>
+								<option value='published'>Published</option>
+								<option value='draft'>Draft</option>
+							</Select>
+							<Button w='md' colorScheme='blue' onClick={() => handleOpenMmodal('section')}>Add Section</Button>
 						</Center>
 					</Flex>
 				</Box>
@@ -163,8 +212,8 @@ const SingleCourse = () => {
 										<HStack>
 											<Heading fontSize='md' pl='5'>Lessons</Heading>
 											<Spacer />
-											<Button size='xs' colorScheme='green' 
-											onClick={() => handleOpenMmodal('lesson', x.title)}
+											<Button size='xs' colorScheme='green'
+												onClick={() => handleOpenMmodal('lesson', x.title)}
 											// onClick={() => handleAddLesson(x.title)}
 											>Add Lesson</Button>
 										</HStack>
@@ -179,7 +228,7 @@ const SingleCourse = () => {
 													<Spacer />
 													<Icon as={FiEye} />
 
-													<Link to={`lesson/${z.id}`}>
+													<Link to={`lesson/${z.id}`} state={data}>
 														<Icon as={FiEdit2} />
 													</Link>
 
@@ -211,8 +260,8 @@ const SingleCourse = () => {
 					<ModalHeader>Add {modalFor}</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-						{modalFor === "section" ? <Input type='text' placeholder='Insert section title' onChange={(e) => setSectionTitle(e.target.value)} /> : 
-												<Input type='text' placeholder='Insert lesson title' onChange={(e) => setLessonTitle(e.target.value)} />}
+						{modalFor === "section" ? <Input type='text' placeholder='Insert section title' onChange={(e) => setSectionTitle(e.target.value)} /> :
+							<Input type='text' placeholder='Insert lesson title' onChange={(e) => setLessonTitle(e.target.value)} />}
 
 					</ModalBody>
 
@@ -220,11 +269,11 @@ const SingleCourse = () => {
 						{/* <Button colorScheme='blue' mr={3} onClick={onClose}>
 							Close
 						</Button> */}
-						{modalFor === "section" ? 
-						<Button colorScheme='green' onClick={() => handleAddSection()}>Add Section</Button> : 
-						<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
+						{modalFor === "section" ?
+							<Button colorScheme='blue' onClick={() => handleAddSection()}>Add Section</Button> :
+							<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
 						}
-						
+
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
