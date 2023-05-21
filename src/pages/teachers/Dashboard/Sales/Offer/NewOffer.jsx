@@ -49,7 +49,7 @@ const NewOffer = () => {
 	const [productActive, setProductActive] = useState([]);
 
 	const handleAddOffer = async () => {
-		// setLoading(true);
+		setLoading(true);
 
 		const dataObject = {
 			project_id: PROJECT_ID,
@@ -65,21 +65,21 @@ const NewOffer = () => {
 
 		console.log(dataObject, 'xxx')
 
-		// try {
-		// 	const docRef = await addDoc(collection(db, "offers"), dataObject);
-		// 	console.log("Added document with ID: ", docRef.id);
-		// 	if (docRef.id) {
-		// 		toast({
-		// 			title: "Rifqy Ganteng",
-		// 			description: "Success add offers.",
-		// 			status: "success",
-		// 		});
-		// 	}
-		// 	setLoading(false);
-		// } catch (error) {
-		// 	console.log(error, "ini error");
-		// 	setLoading(false);
-		// }
+		try {
+			const docRef = await addDoc(collection(db, "offers"), dataObject);
+			console.log("Added document with ID: ", docRef.id);
+			if (docRef.id) {
+				toast({
+					title: "Rifqy Ganteng",
+					description: "Success add offers.",
+					status: "success",
+				});
+			}
+			setLoading(false);
+		} catch (error) {
+			console.log(error, "ini error");
+			setLoading(false);
+		}
 	};
 
 	const getProducts = async () => {

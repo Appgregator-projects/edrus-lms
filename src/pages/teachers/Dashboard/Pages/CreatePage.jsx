@@ -22,7 +22,7 @@ import React, { useEffect, useState } from 'react'
 import { FiBook, FiEdit, FiExternalLink, FiMoreVertical, FiTrash2, FiUser, FiYoutube } from 'react-icons/fi';
 import Sidebar from '../../../../components/teachers/Sidebar'
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
 import { ChevronLeftIcon } from '@chakra-ui/icons';
@@ -138,7 +138,12 @@ function CreatePage() {
 							<Heading>
 								{dataBase ? dataBase.title : <Center><Spinner></Spinner></Center>}
 							</Heading>
-
+						</HStack>
+						<HStack>
+							<Text m='0' as='u'>Overview</Text>
+							<Link to='design'>
+								<Text m='0'>Design</Text>
+							</Link>
 						</HStack>
 						<Input type='text' placeholder={dataBase ? dataBase.title : ''} onChange={(e) => setDataBase({ ...dataBase, title: e.target.value })} />
 						<Button m='1' width='full' onClick={() => console.log(dataBase, data)}>Check Console</Button>
@@ -178,29 +183,37 @@ function CreatePage() {
 
 					</Container>
 				</Box>
-				<Box
-					width='40%'
+				<Box width='40%'
 					maxH={height * 0.8}
-					border='8px'
-					borderColor='black'
-					borderRadius='xl'
-					p='2'
-					overflowX='auto'
 				>
-					<VStack>
-						{data ? data.map((x, i) => {
-							if (x.type === 'header')
-								return <Heading key={i} fontSize='sm'>{x.title}</Heading>
-							else if (x.type === 'image')
-								return <Avatar key={i} name={x.title} size='2xl' src={'https://bit.ly/dan-abramov'} />
-							else
-								return <Button key={i} width='full' m='10'>{x.title}</Button>
-						}
-						)
-							:
-							<></>}
+					<Box
+						width='full%'
+						border='8px'
+						borderColor='black'
+						borderRadius='xl'
+						p='2'
+						overflowX='auto'
+					>
+						<Center>
+							<VStack>
+								{data ? data.map((x, i) => {
+									if (x.type === 'header')
+										return <Heading key={i} fontSize='sm'>{x.title}</Heading>
+									else if (x.type === 'image')
+										return <Avatar key={i} name={x.title} size='2xl' src={'https://bit.ly/dan-abramov'} />
+									else
+										return <Button key={i} width='full' m='10'>{x.title}</Button>
+								}
+								)
+									:
+									<></>}
 
-					</VStack>
+							</VStack>
+						</Center>
+					</Box>
+					<Center>
+						Want to customize your web app and mobile app ?
+					</Center>
 				</Box>
 			</Flex>
 
@@ -233,13 +246,6 @@ function CreatePage() {
 						})}
 					</SimpleGrid>
 				</ModalBody>
-
-				{/* <ModalFooter>
-					<Button colorScheme='blue' mr={3} onClick={onClose}>
-						Close
-					</Button>
-					<Button variant='ghost'>Secondary Action</Button>
-				</ModalFooter> */}
 			</ModalContent>
 		</Modal>
 	</>
