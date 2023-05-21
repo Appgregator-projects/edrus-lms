@@ -22,7 +22,7 @@ import {
 	Circle,
 	Button,
 } from "@chakra-ui/react";
-import { FiHome, FiMenu, FiSettings, FiUsers } from "react-icons/fi";
+import { FiClipboard, FiHome, FiMenu, FiSettings, FiUsers } from "react-icons/fi";
 import { IconType } from "react-icons";
 import {
 	BsDoorOpenFill,
@@ -41,6 +41,7 @@ interface LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
 	{ name: "Dashboard", icon: FiHome, link: "/teacher/dashboard" },
+	{ name: "Pages", icon: FiClipboard, link: "/teacher/pages" },
 	{ name: "Course", icon: BsBook, link: "/teacher/courses" },
 	// { name: 'Sections', icon: AiOutlineSnippets, link: '/teacher/sections' },
 	// { name: 'Lessons', icon: RiFileList2Line, link: '/teacher/lessons' },
@@ -69,11 +70,11 @@ export default function Sidebar({ children }: { children: ReactNode }) {
 				size="full"
 			>
 				<DrawerContent>
-					<SidebarContent onClose={onClose} />
+					{/* <SidebarContent onClose={onClose} /> */}
 				</DrawerContent>
 			</Drawer>
 			{/* mobilenav */}
-			<MobileNav onOpen={onOpen} />
+			{/* <MobileNav onOpen={onOpen} /> */}
 			<Box ml={{ base: 0, md: 60 }} p="4">
 				{children}
 			</Box>
