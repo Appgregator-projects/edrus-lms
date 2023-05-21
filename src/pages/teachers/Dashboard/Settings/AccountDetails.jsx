@@ -98,7 +98,7 @@ const AccountDetails = () => {
 							duration: 9000,
 							isClosable: true,
 						});
-
+						setData({});
 						console.log(data, "ni data");
 					});
 			}
@@ -219,6 +219,8 @@ const AccountDetails = () => {
 											image: e.target.files[0],
 										})
 									}
+									variant="unstyled"
+									accept="image/*"
 								/>
 							</VStack>
 						</HStack>
