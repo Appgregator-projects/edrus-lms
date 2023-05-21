@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../../../../../components/teachers/Sidebar";
 import {
 	Box,
@@ -48,10 +48,38 @@ import {
 	FiMoreHorizontal,
 	FiXCircle,
 } from "react-icons/fi";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../../../../config/firebase";
 
 const Offers = () => {
 	const tabList = ["published", "draft", "all"];
 	const navigate = useNavigate();
+
+	const PROJECT_ID = 'rifqyganteng';
+
+	const [offerList, setOfferList] = useState([]);
+
+
+
+	const getOfferData = async () => {
+		try {
+			const col = collection(db, "offers");
+			const q = query(col, where("project_id", "==", PROJECT_ID));
+			const querySnapshot = await getDocs(q);
+			const dataArr = querySnapshot.docs.map((doc) => doc.data());
+			setOfferList(dataArr);
+		} catch (error) {
+			console.log(error, 'ini error');
+		}
+	};
+
+	useEffect(() => {
+		getOfferData();
+		return () => { };
+	}, []);
+
+
+
 	const data = [
 		{
 			id: 1,
@@ -93,7 +121,7 @@ const Offers = () => {
 					</Text>
 					<BsQuestionCircle fontSize="13px" m="0" />
 				</Flex>
-				<Link to="/teacher/offers/new/banner">
+				<Link to="/teacher/offers/new">
 					<Button colorScheme="green">Add New Offer</Button>
 				</Link>
 			</Flex>
@@ -170,7 +198,7 @@ const Offers = () => {
 
 					<TabPanels>
 						<TabPanel>
-							{data.length !== 0 ? (
+							{offerList.length !== 0 ? (
 								<>
 									<InputGroup>
 										<InputLeftElement pointerEvents="none">
@@ -209,10 +237,10 @@ const Offers = () => {
 												</Tr>
 											</Thead>
 											<Tbody>
-												{data.map(
+												{offerList.map(
 													(item, id) =>
 														item.status ===
-														"published" ? (
+															"published" ? (
 															<Tr
 																key={
 																	id
@@ -407,7 +435,7 @@ const Offers = () => {
 												{data.map(
 													(item, id) =>
 														item.status ===
-														"draft" ? (
+															"draft" ? (
 															<Tr
 																key={
 																	id
@@ -558,7 +586,7 @@ const Offers = () => {
 							)}
 						</TabPanel>
 						<TabPanel>
-							{data.length !== 0 ? (
+							{offerList.length !== 0 ? (
 								<>
 									<InputGroup>
 										<InputLeftElement pointerEvents="none">
@@ -579,15 +607,11 @@ const Offers = () => {
 														Title
 													</Th>
 													<Th>
-														Products
+														Offer Type
 													</Th>
-													<Th>Price</Th>
+													<Th>Offer Price</Th>
 													<Th>
-														QTY Sold
-													</Th>
-													<Th>
-														Net
-														Revenue
+														Offer Schedule
 													</Th>
 													<Th>
 														{" "}
@@ -597,7 +621,7 @@ const Offers = () => {
 												</Tr>
 											</Thead>
 											<Tbody>
-												{data.map(
+												{offerList.map(
 													(item, id) => (
 														<Tr
 															key={
@@ -607,7 +631,7 @@ const Offers = () => {
 															<Td>
 																<Image
 																	src={
-																		item.img
+																		'https://images.unsplash.com/photo-1508919801845-fc2ae1bc2a28?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1nfGVufDB8fDB8fA%3D%3D&w=1000&q=80'
 																	}
 																	w="100px"
 																	h="70px"
@@ -625,14 +649,14 @@ const Offers = () => {
 																>
 																	<Tooltip label="Edit details">
 																		{
-																			item.title
+																			item.label
 																		}
 																	</Tooltip>
 																</Text>
 															</Td>
 															<Td>
 																{
-																	item.products
+																	item.product_type
 																}
 															</Td>
 															<Td>
@@ -642,21 +666,13 @@ const Offers = () => {
 															</Td>
 															<Td>
 																{
-																	item.qtySold
+																	item.product_schedule
 																}
 															</Td>
 
 															<Td>
-																{" "}
-																$
-																{
-																	item.netRevenue
-																}{" "}
-																USD
-															</Td>
-															<Td>
 																<Tag>
-																	<TagLabel>
+																	<TagLabel textTransform={'uppercase'}>
 																		{
 																			item.status
 																		}

@@ -1,21 +1,9 @@
 import {
-	AspectRatio,
 	Box,
 	Button,
-	Container,
-	Flex,
-	FormControl,
-	FormLabel,
 	Heading,
-	HStack,
-	Image,
 	Input,
-	Link,
-	Radio,
-	RadioGroup,
 	SimpleGrid,
-	Spacer,
-	Stack,
 	Text,
 	useDisclosure,
 	Modal,
@@ -26,13 +14,14 @@ import {
 	ModalBody,
 	ModalCloseButton,
 	Textarea,
+	Checkbox,
+	Select,
+	Stack,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../../../../components/teachers/Sidebar";
-import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
-import { FiDelete, FiDownload, FiEdit3, FiMinimize } from "react-icons/fi";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../../config/firebase";
 import { UseAuthState } from "../../../../context/Context";
 
@@ -41,12 +30,34 @@ const CreateCourses = () => {
 	const [course, setCourse] = useState({});
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [courseType, setCourseType] = useState();
-	const {
-		user: { uid },
-		project_id,
-	} = UseAuthState();
-	const authentication = { uid, project: project_id };
+	const [offerList, setOfferList] = useState([]);
+	const { user: { uid }, project_id } = UseAuthState();
+
+	const [coursePaid, setCoursePaid] = useState('');
 	const [loading, setLoading] = useState(false);
+
+	const PROJECT_ID = 'rifqyganteng';
+	const authentication = { uid, project_id: PROJECT_ID };
+
+	const getOfferData = async () => {
+		try {
+			const col = collection(db, "offers");
+			const q = query(col, where("project_id", "==", PROJECT_ID));
+			const querySnapshot = await getDocs(q);
+			const dataArr = querySnapshot.docs.map((doc) => ({
+				...doc.data(),
+				course_id: doc.id,
+			}));
+			setOfferList(dataArr);
+		} catch (error) {
+			console.log(error, 'ini error');
+		}
+	};
+
+	useEffect(() => {
+		getOfferData();
+		return () => { };
+	}, []);
 
 	const product = [
 		{
@@ -85,23 +96,31 @@ const CreateCourses = () => {
 		setCourseType(index);
 		onOpen();
 	};
-	const addPicture = () => {};
+
 	const handleAddCourse = async () => {
-		//1. upload image
-		//user/uid/filename.jpg
-		//2 get img url
-		//3. insert to obj
-		//4 inmsert to frbse
 		try {
 			setLoading(true);
-			//add new course with uid and projectid
+			const selectedOffers = offerList
+				.filter((_, index) => course[`offer_${index}`])
+				.map((offer) => ({
+					...offer,
+					offer_active: true,
+				}));
+
 			const newObj = {
 				...course,
+				offer_active: selectedOffers,
 				...authentication,
 				dateAdded: new Date(),
 				lastUpdated: new Date(),
 			};
-			// Add a new document with a generated id.
+
+			// Menghapus semua properti offer_X
+			for (let i = 0; i < offerList.length; i++) {
+				delete newObj[`offer_${i}`];
+			}
+
+
 			const docRef = await addDoc(collection(db, "courses"), newObj);
 			console.log("Document written with ID: ", docRef.id);
 			onClose();
@@ -109,28 +128,19 @@ const CreateCourses = () => {
 			navigate(`/teacher/courses/${docRef.id}`);
 		} catch (error) {
 			console.log(error);
+			setLoading(false);
 		}
 	};
-	console.log(course, "ni course");
 
 	return (
 		<>
 			<SimpleGrid columns="3">
 				{product.map((x, i) => (
-					<Box
-						key={i}
-						p="2"
-						borderRadius="md"
-						shadow="base"
-						m="2"
-					>
+					<Box key={i} p="2" borderRadius="md" shadow="base" m="2">
 						<Heading>{x.icon}</Heading>
 						<Heading fontSize="sm">{x.title}</Heading>
 						<Text>{x.description}</Text>
-						<Button
-							onClick={() => handleModal(i)}
-							colorScheme="green"
-						>
+						<Button onClick={() => handleModal(i)} colorScheme="green">
 							Get Started
 						</Button>
 					</Box>
@@ -142,10 +152,12 @@ const CreateCourses = () => {
 				<ModalContent>
 					<ModalHeader>
 						{courseType ? (
-							<>{`${product[courseType].icon} ${product[courseType].title}`}</>
+							<>
+								{`${product[courseType].icon} ${product[courseType].title}`}
+							</>
 						) : (
 							<></>
-						)}{" "}
+						)}
 					</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
@@ -168,6 +180,12 @@ const CreateCourses = () => {
 								})
 							}
 						/>
+
+						<Select onChange={(e) => setCoursePaid(e.target.value)}>
+							<option value="free">Free</option>
+							<option value="paid">Paid</option>
+						</Select>
+
 						<Input
 							type="file"
 							onChange={(e) =>
@@ -177,6 +195,27 @@ const CreateCourses = () => {
 								})
 							}
 						/>
+						{coursePaid === "paid" && (
+							<Stack>
+								<Heading size="md" mt={4}>
+									Offer List
+								</Heading>
+								{offerList.map((offer, index) => (
+									<Checkbox
+										key={index}
+										value={offer.label}
+										onChange={(e) =>
+											setCourse({
+												...course,
+												[`offer_${index}`]: e.target.checked,
+											})
+										}
+									>
+										{offer.label}
+									</Checkbox>
+								))}
+							</Stack>
+						)}
 					</ModalBody>
 
 					<ModalFooter>
@@ -190,10 +229,7 @@ const CreateCourses = () => {
 								Submit
 							</Button>
 						) : (
-							<Button
-								colorScheme="green"
-								onClick={() => handleAddCourse()}
-							>
+							<Button colorScheme="green" onClick={() => handleAddCourse()}>
 								Submit
 							</Button>
 						)}
@@ -203,6 +239,7 @@ const CreateCourses = () => {
 		</>
 	);
 };
+
 const CreateCoursesPage = () => {
 	return (
 		<Sidebar>
@@ -210,4 +247,5 @@ const CreateCoursesPage = () => {
 		</Sidebar>
 	);
 };
+
 export default CreateCoursesPage;

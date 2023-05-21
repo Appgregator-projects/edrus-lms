@@ -46,7 +46,7 @@ function PaymentPageV2() {
     const priceData = [
 
         {
-            product_id: 1,
+            project_id: 'rifqyganteng',
             product_type: 'product',
             product_schedule: 'UNLIMITED',
             label: 'label A',
@@ -56,8 +56,8 @@ function PaymentPageV2() {
 
 
         {
-            product_id: 2,
-            product_type: 'membership',
+            project_id: 'rifqyganteng',
+            product_type: 'subscription',
             product_schedule: 'MONTH',
             label: 'label B',
             description: 'description apapun itu isi disini',
@@ -162,7 +162,7 @@ function PaymentPageV2() {
             }
             setLoading(false)
         }
-        if (productPayType === "membership") {
+        if (productPayType === "subscription") {
             const dataBody = {
                 company: "ESD",
                 prefix: "LMS",
@@ -194,7 +194,7 @@ function PaymentPageV2() {
                     await setDoc(ref, {
                         uid: currentUser.uid,
                         project_id: PROJECT_ID,
-                        payment_membership: arrayUnion({
+                        payment_subscription: arrayUnion({
                             project_id: PROJECT_ID,
                             product_pay_id: productPayId,
                             product_pay_type: productPayType,
@@ -330,7 +330,7 @@ function PaymentPageV2() {
                                     </HStack>
 
                                     {
-                                        productPayType === "membership" ? (
+                                        productPayType === "subscription" ? (
                                             <HStack>
                                                 <Text fontSize={'sm'} color='gray.700'>Product Schedule</Text>
                                                 <Spacer />
@@ -435,7 +435,7 @@ function PaymentPageV2() {
                                                 <Spinner />
                                             </Stack>
                                         ) : (
-                                            productPayType === 'membership' ? (
+                                            productPayType === 'subscription' ? (
                                                 urlDirect === '' ? (
                                                     <Button width="100%" onClick={() => handlePayment()} bg="green.600">
                                                         {/* <Ionicons name="ios-cart-outline" size={25} color="white" /> */}
