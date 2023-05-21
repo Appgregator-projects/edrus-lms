@@ -13,12 +13,12 @@ const root = ReactDOM.createRoot(container);
 root.render(
 	<BrowserRouter>
 		<ChakraProvider>
-			<StrictMode>
+			{/* <StrictMode> */}
 				<ColorModeScript />
 				<AuthProvider>
 					<App />
 				</AuthProvider>
-			</StrictMode>
+			{/* </StrictMode> */}
 		</ChakraProvider>
 	</BrowserRouter>
 );

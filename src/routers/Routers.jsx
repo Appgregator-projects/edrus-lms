@@ -54,6 +54,10 @@ import DripSettings from "../pages/teachers/Dashboard/Settings/Component/DripSet
 import DripSettingsPage from "../pages/teachers/Dashboard/Settings/Component/DripSettings";
 import DomainSettingPage from "../pages/teachers/Dashboard/Settings/Component/DomainSetting";
 import DNSSettingPages from "../pages/teachers/Dashboard/Settings/Component/DNSSetting";
+// import Pagespage from "../pages/teachers/Dashboard/Pages/Pagespage";
+import Page from "../pages/teachers/Dashboard/Pages/Page";
+import CreatePage from "../pages/teachers/Dashboard/Pages/CreatePage";
+
 const Routers = () => {
 	const { user } = UseAuthState();
 	return (
@@ -376,6 +380,41 @@ const Routers = () => {
 						redirectPath="/"
 					>
 						<CustomersTagsPage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/customers/:id"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CustomersSinglePage />
+					</ProtectedRoute>
+				}
+			/>
+
+			{/* ======================================================================== */}
+			<Route
+				path="/teacher/pages"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<Page />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/pages/:id"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreatePage />
 					</ProtectedRoute>
 				}
 			/>
