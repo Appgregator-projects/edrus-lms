@@ -62,6 +62,7 @@ import NewAccountPages from "../pages/teachers/Dashboard/Settings/AccountUser/Ne
 // import Pagespage from "../pages/teachers/Dashboard/Pages/Pagespage";
 import Page from "../pages/teachers/Dashboard/Pages/Page";
 import CreatePage from "../pages/teachers/Dashboard/Pages/CreatePage";
+import PaymentPageV2 from "../pages/all/PaymentPageV2";
 
 const Routers = () => {
 	const { user } = UseAuthState();
@@ -606,6 +607,11 @@ const Routers = () => {
 			<Route
 				path="/teacher/settings/account-users/new"
 				element={<NewAccountPages />}
+			/>
+
+<Route
+				path="/payment"
+				element={<PaymentPageV2 />}
 			/>
 		</Routes>
 	);
