@@ -32,6 +32,8 @@ const AccountDetails = () => {
 	// get data, use efffect, onchange
 	// const { uid } = UseAuthState();
 	const [data, setData] = useState({});
+	const [avatarUpdated, setAvatarUpdated] = useState(false);
+
 	const currentUser = authFirebase.currentUser;
 	const getData = async () => {
 		const docRef = doc(db, "users", currentUser.uid);
@@ -45,6 +47,7 @@ const AccountDetails = () => {
 			// docSnap.data() will be undefined in this case
 			console.log("No such document!");
 		}
+		setAvatarUpdated(false);
 	};
 	const toast = useToast();
 	const updateData = () => {
@@ -87,7 +90,7 @@ const AccountDetails = () => {
 						// update data
 						const ref = doc(db, "users", currentUser.uid);
 						setDoc(ref, data, { merge: true });
-						// setLoading(true);
+						setAvatarUpdated(true);
 						toast({
 							title: "Profile Saved",
 							description: "Your profile has been saved!",
@@ -101,9 +104,10 @@ const AccountDetails = () => {
 			}
 		);
 	};
+
 	useEffect(() => {
 		getData();
-	}, []);
+	}, [avatarUpdated]);
 	return (
 		<>
 			<Flex align="center" gap="2" my="5" justify="space-between">
@@ -215,7 +219,6 @@ const AccountDetails = () => {
 											image: e.target.files[0],
 										})
 									}
-									src={data.image}
 								/>
 							</VStack>
 						</HStack>
