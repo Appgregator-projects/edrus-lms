@@ -55,7 +55,7 @@ const Payment = () => {
 			whatsapp: 6285775033279,
 			status: "completed",
 			statusPayment: "paid",
-
+			type: "Course",
 			date: "22-05-2023",
 			paidAt: "29-05-2023",
 			completedAt: "29-05-2023",
@@ -71,7 +71,7 @@ const Payment = () => {
 			whatsapp: 6285775033279,
 			status: "pending",
 			statusPayment: "paid",
-
+			typr: "Course",
 			date: "22-05-2023",
 			paidAt: "29-05-2023",
 			completedAt: "29-05-2023",
@@ -120,7 +120,7 @@ const Payment = () => {
 							<Th>Name</Th>
 							<Th>Email</Th>
 							<Th>Email Marketing</Th>
-
+							<Th>Type</Th>
 							<Th>Status</Th>
 							<Th>Status Payment</Th>
 							<Th>Date</Th>
@@ -149,7 +149,7 @@ const Payment = () => {
 								</Td>
 								<Td>{item.email}</Td>
 								<Td>{item.eMarket}</Td>
-
+								<Td>{item.type}</Td>
 								<Td>
 									<Tag
 										colorScheme={

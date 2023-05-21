@@ -49,8 +49,6 @@ const LinkItems: Array<LinkItemProps> = [
 	{ name: "Sales", icon: BsFileCheck, link: "#" },
 	{ name: "Customers", icon: FiUsers, link: "/teacher/customers" },
 	{ name: "Setting", icon: FiSettings, link: "/teacher/settings" },
-
-	{ name: "Logout", icon: BsDoorOpenFill, link: "/teacher/login" },
 ];
 
 export default function Sidebar({ children }: { children: ReactNode }) {
@@ -90,9 +88,9 @@ interface SidebarProps extends BoxProps {
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	console.log(location, "ni location");
+	// console.log(location, "ni location");
 	const [sales, setSales] = useState(location.pathname);
-	console.log(sales, "ni sales");
+	// console.log(sales, "ni sales");
 	const salesItem = [
 		{ name: "Offers", link: "/teacher/offers" },
 		{ name: "Coupons", link: "/teacher/coupons" },
