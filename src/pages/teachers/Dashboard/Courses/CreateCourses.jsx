@@ -24,6 +24,12 @@ import { useNavigate } from "react-router-dom";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../../config/firebase";
 import { UseAuthState } from "../../../../context/Context";
+import {
+	getDownloadURL,
+	ref,
+	uploadBytesResumable,
+	uploadString,
+} from "firebase/storage";
 
 const CreateCourses = () => {
 	const navigate = useNavigate();
@@ -96,7 +102,6 @@ const CreateCourses = () => {
 		setCourseType(index);
 		onOpen();
 	};
-
 	const handleAddCourse = async () => {
 		try {
 			setLoading(true);
