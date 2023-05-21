@@ -63,8 +63,6 @@ const NewOffer = () => {
 			product_active: productActive,
 		};
 
-		console.log(dataObject, 'xxx')
-
 		try {
 			const docRef = await addDoc(collection(db, "offers"), dataObject);
 			console.log("Added document with ID: ", docRef.id);
