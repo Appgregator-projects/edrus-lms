@@ -1,369 +1,262 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Sidebar from '../../../../components/teachers/Sidebar';
 import {
-  Box,
-  Button,
-  Card,
-  Circle,
-  Divider,
-  Flex,
-  HStack,
-  Heading,
-  Link,
-  StackDivider,
-  Text,
-  useDisclosure,
+	Box,
+	Button,
+	Card,
+	Circle,
+	Divider,
+	Flex,
+	HStack,
+	Heading,
+	// Link,
+	StackDivider,
+	Text,
+	useDisclosure,
+	Image,
+	Spacer,
+	Center,
+	Accordion,
+	AccordionItem,
+	AccordionButton,
+	AccordionIcon,
+	AccordionPanel,
+	Spinner,
+	Icon,
+	Badge,
+	Container,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalFooter,
+	ModalBody,
+	ModalCloseButton,
+	Input,
 } from '@chakra-ui/react';
 import {
-  AddIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronUpIcon,
+	AddIcon,
+	ChevronDownIcon,
+	ChevronLeftIcon,
+	ChevronUpIcon,
 } from '@chakra-ui/icons';
-import { useNavigate, useParams } from 'react-router-dom';
-import { BsCircle, BsFileCheck, BsFileText } from 'react-icons/bs';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
-import ModalSections from '../Sections/ModalSections';
-import ModalQuiz from '../Quiz/ModalQuiz';
-import ModalLessons from '../Lessons/ModalLessons';
+
+import { db } from '../../../../config/firebase';
+import { addDoc, arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, updateDoc } from 'firebase/firestore';
+import { FiBookOpen, FiEdit2, FiEye, FiFolder, FiMessageCircle, FiVideo } from 'react-icons/fi';
+
+
+
 
 const SingleCourse = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
+	const navigate = useNavigate();
+	const { id } = useParams();
+	const [data, setData] = useState()
+	const [sectionTitle, setSectionTitle] = useState()
+	const { isOpen, onOpen, onClose } = useDisclosure()
+	const [lessonTitle, setLessonTitle] = useState([])
+	const [modalFor, setModalFor] = useState('')
+	const [sectionOnEdit, setSectionOnEdit] = useState('')
+	const [loading, setLoading] = useState(false)
 
-  console.log(id, 'ni cn');
-  const [expand, setExpand] = useState(false);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [modals, setModals] = useState('');
-  const [section, setSection] = useState([]);
-  const saveSection = data => {
-    let arr = [];
-    arr.push({ ...data });
-    setSection([...section, ...arr]);
-    console.log(arr, 'ni arr');
-  };
-  console.log(section, 'ni sec');
-  return (
-    <>
-      <Box my="5">
-        <Link color="#2c698d" fontSize="14px" onClick={() => navigate(-1)}>
-          <ChevronLeftIcon />
-          Back
-        </Link>
-      </Box>
-      <Box>
-        <Flex gap="2">
-          <Heading fontWeight="bold" textTransform="capitalize">
-            {id}
-          </Heading>
-        </Flex>
-        {section.length === 0 ? (
-          <Card p="5">
-            <Link
-              fontSize="12px"
-              onClick={() => {
-                setModals('section');
-                onOpen();
-              }}
-            >
-              <AddIcon mx="1" />
-              Add Section
-            </Link>
-          </Card>
-        ) : (
-          <Box>
-            {section.map((dataSection, id) => (
-              <>
-                <Card p="5" my="5">
-                  <Flex justify="space-between" align="center">
-                    <Flex gap="2" align="center" my="2">
-                      <Flex align="center" gap="2">
-                        <BsCircle />
-                        <Flex flexDir="column">
-                          <Text textTransform="capitalize" m="0">
-                            {dataSection.title}
-                          </Text>
-                        </Flex>
-                      </Flex>
-                    </Flex>
-                    {!expand ? (
-                      <Flex
-                        fontWeight="bold"
-                        align="center"
-                        gap="1"
-                        onClick={() => setExpand(true)}
-                        cursor="pointer"
-                        my="5"
-                      >
-                        <Box>
-                          <Circle bgColor="#235af4">
-                            <ChevronDownIcon color="white" fontSize="18px" />
-                          </Circle>
-                        </Box>
-                        <Text color="#235af4" fontSize="12px" m="0">
-                          Expand
-                        </Text>
-                      </Flex>
-                    ) : (
-                      <Flex
-                        fontWeight="bold"
-                        align="center"
-                        gap="1"
-                        onClick={() => setExpand(false)}
-                        cursor="pointer"
-                        my="5"
-                      >
-                        <Box>
-                          <Circle bgColor="#235af4">
-                            <ChevronUpIcon color="white" fontSize="18px" />
-                          </Circle>
-                        </Box>
-                        <Text color="#235af4" fontSize="12px" m="0">
-                          Collapse
-                        </Text>
-                      </Flex>
-                    )}
-                  </Flex>
-                  {expand ? (
-                    <Box>
-                      <Box>
-                        <Flex align="center" gap="2">
-                          <BsFileText />
-                          <Text m="0">Lessons</Text>
-                        </Flex>
-                      </Box>
-                      <Box px="5">
-                        {/* <Flex gap="2" align="center" my="2">
-                          <Flex align="center" gap="2">
-                            <BsCircle />
-                            <Flex flexDir="column">
-                              <Text m="0">Present tense</Text>
-                            </Flex>
-                          </Flex>
-                        </Flex>
-                        <Flex gap="2" align="center" my="2">
-                          <BsCircle />
-                          <Flex flexDir="column">
-                            <Text m="0">Past tense</Text>
-                          </Flex>
-                        </Flex> */}
+	const getCourseDetail = async () => {
+		const unsub = onSnapshot(doc(db, "courses", id), (doc) => {
+			console.log("Current data: ", doc.data());
+			setData(doc.data())
+		});
+	}
 
-                        <Link
-                          fontSize="12px"
-                          onClick={() => {
-                            onOpen();
-                            setModals('lesson');
-                          }}
-                        >
-                          <AddIcon mx="2" />
-                          Add Lesson
-                        </Link>
-                      </Box>
-                      <Box my="5">
-                        <Flex align="center" gap="2">
-                          <BsFileText />
-                          <Text m="0">Quiz</Text>
-                        </Flex>
-                      </Box>
-                      <Box px="5">
-                        {/* <Flex gap="2" align="center" my="2">
-                          <BsFileCheck fontSize="18px" />
-                          <Text m="0">Final Quiz </Text>
-                        </Flex> */}
-                        <Link
-                          fontSize="12px"
-                          onClick={() => {
-                            onOpen();
-                            setModals('quiz');
-                          }}
-                        >
-                          <AddIcon mx="2" />
-                          Add Quiz
-                        </Link>
-                      </Box>
-                    </Box>
-                  ) : (
-                    <></>
-                  )}
-                </Card>
-              </>
-            ))}
-            <Link
-              fontSize="12px"
-              onClick={() => {
-                setModals('section');
-                onOpen();
-              }}
-            >
-              <AddIcon mx="2" />
-              Add Section
-            </Link>{' '}
-          </Box>
-        )}
-        {/* <Card p="5" gap="5" display="flex" m="0">
-          <Flex justify="space-between" align="start">
-            <Box>
-              <Flex gap="2" align="center">
-                <BsCircle />
-                <Flex flexDir="column">
-                  <Text m="0">Grammar</Text>
-                  <HStack
-                    divider={<StackDivider />}
-                    fontSize="13.2px"
-                    color="#728188"
-                    fontWeight="bold"
-                  >
-                    <Text m="0">2 Lessons</Text>
-                    <Text m="0">1 Quiz</Text>
-                  </HStack>
-                </Flex>
-              </Flex>
-            </Box>
-            {!expand ? (
-              <Flex
-                fontWeight="bold"
-                align="center"
-                gap="1"
-                onClick={() => setExpand(true)}
-                cursor="pointer"
-                my="5"
-              >
-                <Box>
-                  <Circle bgColor="#235af4">
-                    <ChevronDownIcon color="white" fontSize="18px" />
-                  </Circle>
-                </Box>
-                <Text color="#235af4" fontSize="12px" m="0">
-                  Expand
-                </Text>
-              </Flex>
-            ) : (
-              <Flex
-                fontWeight="bold"
-                align="center"
-                gap="1"
-                onClick={() => setExpand(false)}
-                cursor="pointer"
-                my="5"
-              >
-                <Box>
-                  <Circle bgColor="#235af4">
-                    <ChevronUpIcon color="white" fontSize="18px" />
-                  </Circle>
-                </Box>
-                <Text color="#235af4" fontSize="12px" m="0">
-                  Collapse
-                </Text>
-              </Flex>
-            )}
-          </Flex>
-          {expand ? (
-            <Box>
-              <Box>
-                <Flex align="center" gap="2">
-                  <BsFileText />
-                  <Text m="0">Lessons</Text>
-                </Flex>
-              </Box>
-              <Box px="5">
-                <Flex gap="2" align="center" my="2">
-                  <Flex align="center" gap="2">
-                    <BsCircle />
-                    <Flex flexDir="column">
-                      <Text m="0">Present tense</Text>
-                    </Flex>
-                  </Flex>
-                </Flex>
-                <Flex gap="2" align="center" my="2">
-                  <BsCircle />
-                  <Flex flexDir="column">
-                    <Text m="0">Past tense</Text>
-                  </Flex>
-                </Flex>
+	const handleAddSection = async () => {
+		onClose()
+		const course = doc(db, "courses", id);
+		await updateDoc(course, {
+			sections: arrayUnion({ title: sectionTitle })
+		});
+	}
 
-                <Link
-                  fontSize="12px"
-                  onClick={() => {
-                    onOpen();
-                    setModals('lessons');
-                  }}
-                >
-                  <AddIcon mx="2" />
-                  Add Lesson
-                </Link>
-              </Box>
-              <Box my="5">
-                <Flex align="center" gap="2">
-                  <BsFileText />
-                  <Text m="0">Quiz</Text>
-                </Flex>
-              </Box>
-              <Box px="5">
-                <Flex gap="2" align="center" my="2">
-                  <BsFileCheck fontSize="18px" />
-                  <Text m="0">Final Quiz </Text>
-                </Flex>
-                <Link
-                  fontSize="12px"
-                  onClick={() => {
-                    onOpen();
-                    setModals('quiz');
-                  }}
-                >
-                  <AddIcon mx="2" />
-                  Add Quiz
-                </Link>
-              </Box>
-            </Box>
-          ) : (
-            <></>
-          )}
-          <Link
-            fontSize="12px"
-            onClick={() => {
-              setModals('Section');
-              onOpen();
-            }}
-          >
-            <AddIcon mx="2" />
-            Add Section
-          </Link>
-        </Card> */}
-      </Box>
-      <Flex my="5" align="center" justify="right">
-        <Button
-          colorScheme="blue"
-          color="white"
-          bgColor="#2c698d"
-          onClick={() => navigate('/teacher/courses')}
-        >
-          Done
-        </Button>
-      </Flex>
-      {modals === 'section' ? (
-        <ModalSections
-          isOpen={isOpen}
-          onClose={onClose}
-          setModals={setModals}
-          setSection={setSection}
-          saveSection={saveSection}
-        />
-      ) : modals === 'lesson' ? (
-        <ModalLessons isOpen={isOpen} onClose={onClose} setModals={setModals} />
-      ) : modals === 'quiz' ? (
-        <ModalQuiz isOpen={isOpen} onClose={onClose} setModals={setModals} />
-      ) : (
-        <></>
-      )}
-    </>
-  );
+	const handleAddLesson = async () => {
+		setLoading(true)
+		const section = sectionOnEdit
+		//ADD NEW LESSON FIRST AND GET THE ID
+		const docRef = await addDoc(collection(db, `courses/${id}/lesson`), { title: lessonTitle, status: 'draft', comment: 'hidden' });
+		const lessonId = docRef.id;
+
+		//insert array union to courses db
+		const course = doc(db, "courses", id);
+		await updateDoc(course, {
+			lessons: arrayUnion({ id: lessonId, title: lessonTitle, section: section })
+		});
+		setLoading(false)
+
+		onClose()
+	}
+
+	const getLessons = (section) => {
+		if (data.lessons)
+			return data.lessons.filter((x) => x.section === section)
+	}
+
+	const handleOpenMmodal = (type, sectionTitle) => {
+		setModalFor(type)
+		onOpen()
+		if (type === "lesson") {
+			setSectionOnEdit(sectionTitle)
+		}
+	}
+
+	useEffect(() => {
+		getCourseDetail()
+		return () => {
+		}
+	}, [])
+
+
+	return (
+		<>
+			<Box my="5">
+				<HStack color="#2c698d" fontSize="14px" onClick={() => navigate(-1)}>
+					<ChevronLeftIcon />
+					<Text>Back</Text>
+				</HStack>
+			</Box>
+			<Box shadow='base' p='2'>
+				<Box>
+					<Flex >
+						{data?.image ?
+							<Image width='100px' src={data.image} alt='Dan Abramov' />
+							:
+							<Image width='100px' src='https://kajabi-app-assets.kajabi-cdn.com/assets/upload_image_placeholder-8156b59904f2c4ffaa4e045f09ee36f73ac4ca59b7232da5cd0d66c95ac53739.png' alt='Dan Abramov' />
+						}
+						<Box p='2'>
+							<Heading fontWeight="bold" textTransform="capitalize">
+								{data ? data.title : <></>}
+							</Heading>
+							<HStack>
+								<Text>Overview</Text>
+								<Text>Customize</Text>
+								<Text>Offers</Text>
+								<Text>Members</Text>
+								<Text>Settings</Text>
+							</HStack>
+						</Box>
+						<Spacer />
+						<Center>
+							<Button colorScheme='blue' onClick={() => handleOpenMmodal('section')}>Add Section</Button>
+						</Center>
+					</Flex>
+				</Box>
+				<Box>
+					<Accordion allowMultiple>
+						{data?.sections ?
+							data.sections.map((x, i) =>
+								<AccordionItem borderBottom='1px' borderColor='gray.50'>
+									<h2>
+										<AccordionButton>
+											<Box as="span" flex='1' textAlign='left'>
+												<HStack>
+													<Icon as={FiFolder} />
+													<Text>
+														{x.title}
+													</Text>
+
+												</HStack>
+											</Box>
+											<AccordionIcon />
+										</AccordionButton>
+									</h2>
+									<AccordionPanel p='2'>
+										<HStack>
+											<Heading fontSize='md' pl='5'>Lessons</Heading>
+											<Spacer />
+											<Button size='xs' colorScheme='green'
+												onClick={() => handleOpenMmodal('lesson', x.title)}
+											// onClick={() => handleAddLesson(x.title)}
+											>Add Lesson</Button>
+										</HStack>
+										{getLessons(x.title) ? getLessons(x.title).map((z) =>
+											<Box borderBottom='1px' pl='10' mb='2' borderColor='gray.50'>
+												<HStack>
+													<Icon as={z.media ? FiVideo : FiBookOpen} />
+													<Box>
+														<Link to={`lesson/${z.id}`}>
+															<Text m='0' >{z.title}</Text>
+															<Text m='0' fontSize='3xs'>ID: {z.id}</Text>
+														</Link>
+
+													</Box>
+													<Spacer />
+													<Icon as={FiEye} />
+
+													<Link to={`lesson/${z.id}`}>
+														<Icon as={FiEdit2} />
+													</Link>
+
+													<Icon as={FiMessageCircle} />
+													{/* <Button size='xs' colorScheme='blue' onClick={() => console.log('add content')}>Add Content</Button> */}
+													{z.status ? <Badge colorScheme='green'>published</Badge>
+														:
+														<Badge colorScheme='red'>draft</Badge>
+													}
+												</HStack>
+											</Box>
+										)
+											:
+											<></>}
+									</AccordionPanel>
+								</AccordionItem>
+							)
+							:
+							<Center>
+								<Spinner />
+							</Center>
+						}
+
+
+
+					</Accordion>
+				</Box>
+			</Box>
+			<Modal isOpen={isOpen} onClose={onClose}>
+				<ModalOverlay />
+				<ModalContent>
+					<ModalHeader>Add {modalFor}</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody>
+						{modalFor === "section" ? <Input type='text' placeholder='Insert section title' onChange={(e) => setSectionTitle(e.target.value)} /> :
+							<Input type='text' placeholder='Insert lesson title' onChange={(e) => setLessonTitle(e.target.value)} />}
+
+					</ModalBody>
+
+					<ModalFooter>
+
+						{modalFor === "section" ?
+							<Button colorScheme='green' onClick={() => handleAddSection()}>Add Section</Button>
+							:
+							loading ?
+								<Button
+									isLoading
+									loadingText='Submitting'
+									colorScheme='green'
+								>Add Lesson</Button>
+								:
+								<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
+						}
+
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+
+		</>
+	);
 };
 
 const SingleCoursePage = () => {
-  return (
-    <Sidebar>
-      <SingleCourse />
-    </Sidebar>
-  );
+	return (
+		<Sidebar>
+			<SingleCourse />
+		</Sidebar>
+	);
 };
 export default SingleCoursePage;

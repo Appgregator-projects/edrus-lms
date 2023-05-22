@@ -22,31 +22,46 @@ import { useNavigate } from 'react-router-dom';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import Header from '../../components/students/Header';
+import { UseAuthState } from '../../context/Context';
 
 const Homepage = () => {
 	const navigate = useNavigate();
 	const [courses, setCourses] = useState([])
+	const { user: { name, email } } = UseAuthState();
 
 	const getCourses = async () => {
 		const q = query(collection(db, 'courses'))
 		const querySnapshot = await getDocs(q)
 		let arr = []
-		querySnapshot.forEach((doc)=>{
-			arr.push({id: doc.id, ...doc.data()})
+		querySnapshot.forEach((doc) => {
+			arr.push({ id: doc.id, ...doc.data() })
 		})
 
 		setCourses(arr)
 	}
 
-	useEffect(()=>{
+	const scroll =() =>{
+		const element = document.getElementById('course_section');
+		if (element) {
+		  // 👇 Will scroll smoothly to the top of the next section
+		  element.scrollIntoView({ behavior: 'smooth' });
+		}
+	}
+
+	useEffect(() => {
 		getCourses()
-	},[])
+	}, [])
 	return (
 		<>
 			<Header />
 			<Flex h="75vh" flexDir="column" align="center" justify="center" gap="10">
-				<Heading>Welcome</Heading>
+				<Heading>Welcome {name ? ", " + name : ", " + email}</Heading>
+				<Flex gap={3}>
+					<Button onClick={() => scroll()}>Start Exploring</Button>
+					<Button onClick={() => navigate('/teacher/dashboard')}>Start Creating Sellable Course</Button>
+				</Flex>
 			</Flex>
+
 			<Box bgColor="#272643">
 				<HStack
 					divider={<StackDivider />}
@@ -83,7 +98,8 @@ const Homepage = () => {
 				</HStack>
 			</Box>
 			<Box px="10">
-				<Text fontSize="48px" fontWeight="bold" textAlign="center">
+				<div className='course_section'>
+				<Text fontSize="48px" fontWeight="bold" textAlign="center" >
 					Courses
 				</Text>
 				<Flex align="center" justify="space-between">
@@ -103,32 +119,34 @@ const Homepage = () => {
 						<Text>popular</Text>
 					</HStack>
 				</Flex>
-				
 
-					<SimpleGrid columns={{base : 1, md:2, lg:4, xl: 5}}>
-						{courses?.length > 0 ? courses.map((item, index) => (
-							<Card key={index} cursor='pointer' onClick={()=>navigate(`/courses/${item.id}`, {state : item})}>
-								<CardBody>
-									<Image
-										src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
-										alt="Green double couch with wooden legs"
-										borderRadius="lg"
-									/>
-									<Stack mt="6" spacing="3">
-										<Heading size="sm">{item.title}</Heading>
-										<Text fontSize={12}>
-											This sofa is per..
-										</Text>
-									</Stack>
-								</CardBody>
-								<CardFooter>
-									<Button variant="solid" bgColor="#2c698d" color="white" w="100%" size='xs'>
-										Enroll
-									</Button>
-								</CardFooter>
-							</Card>
-						)): null}
-					</SimpleGrid>
+				</div>
+
+
+				<SimpleGrid columns={{ base: 1, md: 2, lg: 4, xl: 5 }}>
+					{courses?.length > 0 ? courses.map((item, index) => (
+						<Card key={index} cursor='pointer' onClick={() => navigate(`/courses/${item.id}`, { state: item })}>
+							<CardBody>
+								<Image
+									src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+									alt="Green double couch with wooden legs"
+									borderRadius="lg"
+								/>
+								<Stack mt="6" spacing="3">
+									<Heading size="sm">{item.title}</Heading>
+									<Text fontSize={12}>
+										This sofa is per..
+									</Text>
+								</Stack>
+							</CardBody>
+							<CardFooter>
+								<Button variant="solid" bgColor="#2c698d" color="white" w="100%" size='xs'>
+									Enroll
+								</Button>
+							</CardFooter>
+						</Card>
+					)) : null}
+				</SimpleGrid>
 				<Text textAlign="center" my="10">
 					There are no available courses yet.
 				</Text>
