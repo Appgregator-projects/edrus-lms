@@ -10,7 +10,9 @@ export const initialState = {
   course: [] || course,
   user : null || user,
   error : null,
-  loading : false
+  loading : false,
+  project_id : null,
+  user_uid : null
 };
 
 export const AuthReducer = (initialState, action) => {
@@ -28,7 +30,8 @@ export const AuthReducer = (initialState, action) => {
       case 'LOGIN_SUCCESS':
       return {
         ...initialState,
-        user: action.payload,
+        user: action.payload.user,
+        user_uid: action.payload.user_uid,
       };
       case 'LOGOUT_SUCCESS':
       return {
@@ -41,6 +44,12 @@ export const AuthReducer = (initialState, action) => {
       return {
         ...initialState,
         course: action.cart,
+      };
+    case 'ADD_PROJECT_SUCCESS':
+      return {
+        ...initialState,
+        project_id: action.payload.project_id,
+        user_uid: action.payload.user_uid
       };
     default:
       return {

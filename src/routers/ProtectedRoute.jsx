@@ -22,8 +22,8 @@ const ProtectedRoute = ({
   //   );
   // }
 
-  if (user ) return children 
-  if (!user) return <Navigate to={redirectPath} replace />
+  if (user !== null || user === true) return children 
+  if (user === null || user === false) return <Navigate to={redirectPath} replace />
 };
 
 export default ProtectedRoute;
