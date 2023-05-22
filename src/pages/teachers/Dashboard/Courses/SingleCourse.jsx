@@ -60,6 +60,7 @@ const SingleCourse = () => {
 	const [lessonTitle, setLessonTitle] = useState([])
 	const [modalFor, setModalFor] = useState('')
 	const [sectionOnEdit, setSectionOnEdit] = useState('')
+	const [loading, setLoading] = useState(false)
 
 	const getCourseDetail = async () => {
 		const unsub = onSnapshot(doc(db, "courses", id), (doc) => {
@@ -77,17 +78,19 @@ const SingleCourse = () => {
 	}
 
 	const handleAddLesson = async () => {
+		setLoading(true)
 		const section = sectionOnEdit
 		//ADD NEW LESSON FIRST AND GET THE ID
-		const docRef = await addDoc(collection(db, `courses/${id}/lesson`), { title: lessonTitle });
+		const docRef = await addDoc(collection(db, `courses/${id}/lesson`), { title: lessonTitle, status: 'draft', comment: 'hidden' });
 		const lessonId = docRef.id;
 
 		//insert array union to courses db
 		const course = doc(db, "courses", id);
-		const result = await updateDoc(course, {
+		await updateDoc(course, {
 			lessons: arrayUnion({ id: lessonId, title: lessonTitle, section: section })
 		});
-		console.log(result)
+		setLoading(false)
+
 		onClose()
 	}
 
@@ -154,7 +157,12 @@ const SingleCourse = () => {
 			<Box shadow='base' p='2'>
 				<Box>
 					<Flex >
-						<Image boxSize='100px' src='https://bit.ly/dan-abramov' alt='Dan Abramov' />
+						{data?.image ?
+							<Image width='100px' src={data.image} alt='Dan Abramov' />
+
+							:
+							<Image width='100px' src='https://kajabi-app-assets.kajabi-cdn.com/assets/upload_image_placeholder-8156b59904f2c4ffaa4e045f09ee36f73ac4ca59b7232da5cd0d66c95ac53739.png' alt='Dan Abramov' />
+						}
 						<Box p='2'>
 							<HStack>
 								<Heading fontWeight="bold" textTransform="capitalize">
@@ -180,12 +188,8 @@ const SingleCourse = () => {
 							</HStack>
 						</Box>
 						<Spacer />
-						<Center gap={2}>
-							<Select onChange={handleChangeStatus} placeholder={data?.status !== undefined ? data?.status : 'Status:' }>
-								<option value='published'>Published</option>
-								<option value='draft'>Draft</option>
-							</Select>
-							<Button w='md' colorScheme='blue' onClick={() => handleOpenMmodal('section')}>Add Section</Button>
+						<Center>
+							<Button colorScheme='blue' onClick={() => handleOpenMmodal('section')}>Add Section</Button>
 						</Center>
 					</Flex>
 				</Box>
@@ -220,10 +224,13 @@ const SingleCourse = () => {
 										{getLessons(x.title) ? getLessons(x.title).map((z) =>
 											<Box borderBottom='1px' pl='10' mb='2' borderColor='gray.50'>
 												<HStack>
-													<Icon as={FiBookOpen} />
+													<Icon as={z.media ? FiVideo : FiBookOpen} />
 													<Box>
-														<Text m='0' >{z.title}</Text>
-														<Text m='0' fontSize='3xs'>ID: {z.id}</Text>
+														<Link to={`lesson/${z.id}`}>
+															<Text m='0' >{z.title}</Text>
+															<Text m='0' fontSize='3xs'>ID: {z.id}</Text>
+														</Link>
+
 													</Box>
 													<Spacer />
 													<Icon as={FiEye} />
@@ -234,7 +241,10 @@ const SingleCourse = () => {
 
 													<Icon as={FiMessageCircle} />
 													{/* <Button size='xs' colorScheme='blue' onClick={() => console.log('add content')}>Add Content</Button> */}
-													<Badge colorScheme='green'>Published</Badge>
+													{z.status ? <Badge colorScheme='green'>published</Badge>
+														:
+														<Badge colorScheme='red'>draft</Badge>
+													}
 												</HStack>
 											</Box>
 										)
@@ -266,12 +276,18 @@ const SingleCourse = () => {
 					</ModalBody>
 
 					<ModalFooter>
-						{/* <Button colorScheme='blue' mr={3} onClick={onClose}>
-							Close
-						</Button> */}
+
 						{modalFor === "section" ?
-							<Button colorScheme='blue' onClick={() => handleAddSection()}>Add Section</Button> :
-							<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
+							<Button colorScheme='green' onClick={() => handleAddSection()}>Add Section</Button>
+							:
+							loading ?
+								<Button
+									isLoading
+									loadingText='Submitting'
+									colorScheme='green'
+								>Add Lesson</Button>
+								:
+								<Button colorScheme='green' onClick={() => handleAddLesson()}>Add Lesson</Button>
 						}
 
 					</ModalFooter>

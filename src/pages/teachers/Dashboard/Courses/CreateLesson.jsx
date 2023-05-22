@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import {
-	AspectRatio,
 	Box,
 	Button,
 	Center,
@@ -18,23 +17,52 @@ import {
 	ModalOverlay,
 	Radio,
 	RadioGroup,
+	SimpleGrid,
 	Spacer,
 	Spinner,
 	Stack,
+	TabList,
+	TabPanel,
+	TabPanels,
+	Tabs,
+	Tab,
 	Text,
+	Center,
+	Container,
 	useDisclosure,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalFooter,
+	ModalBody,
+	ModalCloseButton,
+	Select,
+	CircularProgress,
 } from '@chakra-ui/react';
-import { FiDelete, FiDownload, FiEdit3 } from 'react-icons/fi';
+import { FiDelete, FiDownload, FiEdit3, FiEyeOff, FiVideo, FiVolume2 } from 'react-icons/fi';
 import Sidebar from '../../../../components/teachers/Sidebar';
-import { db } from '../../../../config/firebase';
+import { db, storage } from '../../../../config/firebase';
 import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2'
-import { UploadBlob } from '../../../../utils/Upload';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { getDownloadURL, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
+import { UseAuthState } from '../../../../context/Context';
+import ReactPlayer from 'react-player';
+import { ChevronLeftIcon } from '@chakra-ui/icons';
+
 
 function CreateLesson() {
 	const [data, setData] = useState()
+	const [loading, setLoading] = useState(false)
+	const [description, setDescription] = useState("")
+	const [modalData, setModalData] = useState({ key: 0, type: 0, format: 0 })
+
 	const { id, lessonId } = useParams();
+	const { isOpen, onOpen, onClose } = useDisclosure()
+
 	const navigate = useNavigate()
 	const [modalFor, setModalFor] = useState("")
 	const [newData, setNewData] = useState({})
@@ -43,17 +71,24 @@ function CreateLesson() {
 	const { state } = useLocation()
 
 
+	const { user } = UseAuthState();
+
+
 	const getLesson = async () => {
 		const docRef = doc(db, `courses/${id}/lesson`, lessonId);
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
-			console.log("Document data:", docSnap.data());
-			setData(docSnap.data())
+			const data = docSnap.data()
+			data.id = lessonId
+			console.log(data)
+			setData(data)
+			if (data.description)
+				setDescription(data.description)
+
 		} else {
 			console.log("No such document!");
 		}
 	}
-
 
 	const confirmDelete = async () => {
 		Swal.fire({
@@ -83,115 +118,136 @@ function CreateLesson() {
 		})
 	}
 
-	const handleSave = async () => {
-		console.log(newData)
+	const MediaType = () => (
+		<Tabs isFitted variant='soft-rounded'>
+			<TabList>
+				<Tab>
+					<HStack>
+						<FiEyeOff />
+						<Text>
+							None
+						</Text>
+					</HStack>
+				</Tab>
+				<Tab><HStack>
+					<FiVideo />
+					<Text>
+						Video
+					</Text>
+				</HStack></Tab>
+				<Tab><HStack>
+					<FiVolume2 />
+					<Text>
+						Audio
+					</Text>
+				</HStack></Tab>
+			</TabList>
 
+			<TabPanels>
+				<TabPanel>
+				</TabPanel>
+				<TabPanel>
+					<Container borderRadius='md' p='5' border='1px' borderColor='gray' borderStyle='dotted'>
+						<Center>
+							<FiVideo />
+						</Center>
+						<Center>
+							<Button onClick={() => handleModal('video', 'media')}>
+								Upload Video
+							</Button>
+						</Center>
+					</Container>
+				</TabPanel>
+				<TabPanel>
+					<Container borderRadius='md' p='5' border='1px' borderColor='gray' borderStyle='dotted'>
+						<Center>
+							<FiVolume2 width='25px' />
+						</Center>
+						<Center>
+							<Button onClick={() => handleModal('audio', 'media')}>
+								Upload Audio
+							</Button>
+						</Center>
+					</Container>
+				</TabPanel>
+			</TabPanels>
+		</Tabs>
+	)
 
-		// updating lesson's document
-		const docRef = doc(db, `courses/${id}/lesson`, lessonId);
-		setDoc(docRef,
-			{ ...newData, lastUpdated: new Date() }, { merge: true })
-			.then(() => {
-				Swal.fire('Saved!', `Success saving`, 'success')
-			})
-			.catch(err => {
-				console.log(err.message)
-				Swal.fire({
-					icon: 'error',
-					title: 'Error',
-					text: err.message,
-				})
-			});
+	const handleModal = (type, key) => {
+		//type is for image/video/sound
+		//key is for naming
+		console.log(type, key)
+		let format = ""
+		if (type === 'image')
+			format = "image/*"
 
+		if (type === 'video')
+			format = "video/*"
 
-		// if the title changes, update array inside course
-		if (newData.title) {
-			//updating lesson's array inside course's document
-			//1. ambil object
-			const oldObject = state.lessons.filter(x => x.id === lessonId)[0]
-			const newObject = { ...oldObject, title: newData.title }
-			//2. hapus yang doc id nya match dari array
-			const newArray = state.lessons.filter(x => x.id !== lessonId)
-			//3. array.push
-			newArray.push(newObject)
-			//4. setDoc course
-	
-			const ref = doc(db, `courses/${id}`);
-			setDoc(ref,
-				{ lessons: newArray, lastUpdated: new Date() }, { merge: true }).then(() => {
-					console.log("update array successful");
-				}).catch(e => {
-					console.log("update array error", e.message);
-				})
-		}
+		if (type === 'audio')
+			format = "audio/*"
 
-	}
-
-	const handleOpenModal = (type) => {
+		setModalData({ type: type, key: key, format: format })
 		onOpen()
-		if (type === "attachment") {
-			setModalFor("attachment")
-		} else if (type === "thumbnail") {
-			setModalFor("thumbnail")
-		}
 	}
 
-	const handleSaveFiles = async () => {
-		if (modalFor === "attachment") {
-			// save to attachment
-			// try {
-			// 	const uploadedAttachment = await UploadBlob(
-			// 		file,
-			// 		"donasi",
-			// 		"beasiswa",
-			// 		file.name,
-			// 		"hardcoded name"
-			// 	)
-			// 	if (uploadedAttachment) {
-			// 		console.log("uploadedAttachment : ---", uploadedAttachment);
-			// 		setNewData({
-			// 			...newData,
-			// 			attachment: uploadedAttachment.url
-			// 		})
-			// 		await handleSave()
-			// 	}
-			// } catch (error) {
-			// 	console.log(error.message, "error on uploading image");
-			// } finally {
-			// 	getLesson()
-			// 	onClose()
-			// };
-			console.log(file)
-		} else if (modalFor === "thumbnail") {
-			//save to thumbnail
-			try {
-				const uploadedImage = await UploadBlob(
-					file,
-					"donasi",
-					"beasiswa",
-					file.name,
-					"hardcoded name"
-				);
-				if (uploadedImage) {
-					console.log("uploadedImage : ---", uploadedImage);
-					setNewData({
-						...newData,
-						thumbnail: uploadedImage.url
-					})
-					console.log({
-						...newData,
-						thumbnail: uploadedImage.url
-					})
-					await handleSave()
+	const handleUpload = async (data) => {
+		const storageRef = ref(storage, `user/${user.uid}/${data.name}`);
+		const uploadTask = uploadBytesResumable(storageRef, data);
+
+		uploadTask.on('state_changed',
+			(snapshot) => {
+				const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+				console.log('Upload is ' + progress + '% done');
+				if (progress !== 100)
+					setLoading(progress)
+				else {
+					onClose()
+					setLoading(false)
 				}
-			} catch (error) {
-				console.log(error.message, "error on uploading image");
-			} finally {
-				getLesson()
-				onClose()
-			};
-		}
+			},
+			(error) => {
+				console.log(error.message)
+			},
+			() => {
+				getDownloadURL(uploadTask.snapshot.ref)
+					.then((downloadURL) => {
+						console.log('File available at', downloadURL);
+						const updateData = {
+							...data,
+							[modalData.key]: downloadURL,
+							[`${modalData.key}_type`]: modalData.type
+						}
+						setData(updateData)
+						return updateData
+					})
+					.then((data) => {
+						const ref = doc(db, `courses/${id}/lesson`, lessonId);
+						setDoc(ref, data, { merge: true });
+					}
+					);
+			})
+
 	}
+
+	const handleSave = async () => {
+		const ref = doc(db, `courses/${id}/lesson`, lessonId);
+		setDoc(ref, {
+			...data,
+			lastUpdated: new Date(),
+			description: description
+		},
+			{ merge: true });
+		navigate(-1)
+	}
+
+	const getFileName = (data) => {
+		let newData = data.split('?')
+		newData = newData[0].split('%2F')
+		return newData[newData.length - 1]
+	}
+
 
 	useEffect(() => {
 		getLesson()
@@ -204,134 +260,155 @@ function CreateLesson() {
 		<Sidebar>
 			<Box>
 				<HStack>
+					<HStack color="#2c698d" fontSize="14px" onClick={() => navigate(-1)}>
+						<ChevronLeftIcon />
+						<Text>Back</Text>
+					</HStack>
 					<Heading>{data?.title ? data.title : <></>}</Heading>
 					<Spacer />
+					<Button onClick={() => console.log(data, modalData, loading)}>Check Console</Button>
 					<Button colorScheme='red' onClick={confirmDelete}>Delete</Button>
 					<Button colorScheme='green' onClick={() => handleSave()}>Save</Button>
 				</HStack>
 				<Flex>
 					<Box width='70%'>
 						<Box borderRadius='md' shadow='base' p='2' m='1'>
-							<Input
-								type='text'
-								placeholder={data?.title ? data.title : 'course'}
-								onChange={e => setNewData({
-									...newData,
-									title: e.target.value
-								})}
-							/>
-							<Flex my={2}>
-								<Text m='1'>Media :</Text>
-								<Input maxW='xl' type='text' placeholder={""} onChange={e => setNewData({
-									...newData,
-									videoUrl: e.target.value
-								})} />
-							</Flex>
-							<AspectRatio maxW='full' ratio={16 / 9}>
-								{data?.videoUrl !== undefined ?
-									<>
-										<iframe
-											title='naruto'
-											src={data.videoUrl}
-											allowFullScreen
-										/>
-										<Text>{data?.videoUrl}</Text>
-									</>
-									: <Text>Tidak ada video pembelajaran</Text>}
-							</AspectRatio>
+							<Text m='1'>Title :</Text>
+							<Input type='text' value={data?.title ? data.title : ''} onChange={(e) => setData({ ...data, title: e.target.value })} />
+
+							<Text m='1'>Section :</Text>
+							<Select>
+								<option>1</option>
+								<option>2</option>
+								<option>3</option>
+
+							</Select>
+
+							<Text m='1'>Media :</Text>
+							<Box p='5'>
+								{data?.media ?
+									<ReactPlayer
+										width='full'
+										controls={true}
+										url={data.media} />
+
+									:
+									<MediaType />}
+							</Box>
+
+							<Box borderRadius='md' border='1px' borderColor='gray' p='2' mr='2' ml='2'>
+								<ReactQuill theme="snow"
+									value={description}
+									onChange={(e) => setDescription(e)}
+								/>
+							</Box>
+
+
 							<HStack m='2'>
 								<Text>Files</Text>
 								<Spacer />
-								<Button size='xs' colorScheme='green' onClick={() => handleOpenModal("attachment")}>Add Files</Button>
+								<Button size='xs' colorScheme='green' onClick={() => handleModal('file', 'download')}>Add Files</Button>
 
 							</HStack>
 							<Box borderRadius='md' border='1px' borderColor='gray.50' pl='2' pr='2' mr='2' ml='2'>
-								<Box borderBottom='1px' borderColor='gray.50'>
 
-									{data?.attachment !== undefined && data?.attachment?.length > 0 ?
+								{data?.download ?
+									<Box borderBottom='1px' borderColor='gray.50'>
 										<HStack>
-											<Box>
-												<Text noOfLines={1} onClick={() => console.log("")}>{data.attachment}</Text>
-											</Box>
+											<Text>{getFileName(data.download)}</Text>
 											<Spacer />
-											<FiDownload />
-											<FiEdit3 />
+											<a
+												href={data.download}
+												download
+												target="_blank" rel="noreferrer"
+											>
+												<FiDownload />
+											</a>
 											<FiDelete />
 										</HStack>
-										:
-										newData?.attachment !== undefined ?
-											<HStack>
-												<Box>
-													<Text onClick={() => console.log("")}>nama filenya</Text>
-												</Box>
-												<Spacer />
-												<FiDownload />
-												<FiEdit3 />
-												<FiDelete />
-											</HStack> : <Text>Tidak ada attachment</Text>
-									}
-								</Box>
-							</Box>
+									</Box>
+									:
+									<Box borderBottom='1px' borderColor='gray.50'>
+									</Box>
 
+								}
+							</Box>
 						</Box>
 					</Box>
+
 					<Box width='30%'>
 						<Box borderRadius='md' shadow='base' p='2' m='1'>
 							<Heading fontSize='md'>Status</Heading>
 							<RadioGroup>
 								<Stack direction='column'>
-									<Radio value='draft' onChange={e => setNewData({
-										...newData,
-										status: e.target.value
-									})} >Draft</Radio>
-									<Radio value='published' onChange={e => setNewData({
-										...newData,
-										status: e.target.value
-									})} >published</Radio>
+									<RadioGroup
+										onChange={(e) => setData({ ...data, status: e })}
+										value={data?.status === 'published' ? 'published' : 'draft'}
+									>
+										<Stack>
+											<Radio value='draft'>Draft</Radio>
+											<Radio value='published'>Published</Radio>
+
+										</Stack>
+									</RadioGroup>
 								</Stack>
 							</RadioGroup>
 						</Box>
+
 						<Box borderRadius='md' shadow='base' p='2' m='1'>
 							<Heading fontSize='md'>Thumbnail</Heading>
-							{data?.thumbnail !== undefined ?
-								<Image src={data?.thumbnail} alt='Dan Abramov' />
-								: <Center>Belum ada thumbnail</Center>}
+							<Image borderRadius='md' border='1px' borderColor='gray' src={data?.thumbnail ? data.thumbnail : 'https://kajabi-app-assets.kajabi-cdn.com/assets/upload_image_placeholder-8156b59904f2c4ffaa4e045f09ee36f73ac4ca59b7232da5cd0d66c95ac53739.png'} alt='Dan Abramov' />
+							<Text fontSize='sm'>
+								Please use .jpg or .png with non-transparent background.
+								Recommended dimensions of 1280x720
+							</Text>
 							<HStack mt='2'>
 								<Button>Remove</Button>
-								<Button onClick={() => handleOpenModal("thumbnail")}>Upload</Button>
+								<Button onClick={() => handleModal('image', 'thumbnail')}>Upload</Button>
 							</HStack>
 						</Box>
+
 						<Box borderRadius='md' shadow='base' p='2' m='1'>
 							<Heading fontSize='md'>Comment</Heading>
 							<RadioGroup>
 								<Stack direction='column'>
-									<Radio value='visible'>Visible</Radio>
-									<Radio value='hidden'>Hidden</Radio>
+									<RadioGroup
+										onChange={(e) => setData({ ...data, comment: e })}
+										value={data?.comment === 'visible' ? 'visible' : 'hidden'}
+									>
+										<Stack>
+											<Radio value='visible'>visible</Radio>
+											<Radio value='hidden'>hidden</Radio>
+										</Stack>
+									</RadioGroup>
 								</Stack>
 							</RadioGroup>
 						</Box>
 					</Box>
 				</Flex >
 			</Box >
+
+
 			<Modal isOpen={isOpen} onClose={onClose}>
 				<ModalOverlay />
 				<ModalContent>
-					<ModalHeader>Click 'Choose File' or drag and drop your {modalFor} below:</ModalHeader>
+					<ModalHeader>Upload {modalData.type} for {modalData.key}</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody>
-						<Input bg="gray.300" padding={10} type='file' placeholder='Insert file' onChange={(e) => setFile(e.target.files[0])} />
+						{loading ?
+							<Center>
+								<CircularProgress value={loading} size='120px' />
+							</Center>
+							:
+							<Center>
+								<Input type='file' accept={modalData.format} onChange={(e) => handleUpload(e.target.files[0])} />
+							</Center>
+						}
+
 					</ModalBody>
-
-					<ModalFooter>
-						{/* <Button colorScheme='blue' mr={3} onClick={onClose}>
-							Close
-						</Button> */}
-						<Button colorScheme='blue' onClick={() => handleSaveFiles()}>Upload {false ? <Spinner mx={5} /> : null}</Button>
-
-					</ModalFooter>
 				</ModalContent>
 			</Modal>
-		</Sidebar>
+		</Sidebar >
 	)
 }
 export default CreateLesson
