@@ -236,7 +236,7 @@ interface MobileProps extends FlexProps {
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	const navigate = useNavigate();
-	const currentUser = authFirebase.currentUser;
+	const currentUser = authFirebase?.currentUser;
 
 	return (
 		<Flex
@@ -263,7 +263,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 			</Flex>
 			<Popover islazy trigger={"hover"}>
 				<PopoverTrigger>
-					<Link>Hi, {currentUser.email}</Link>
+					<Link>Hi, {currentUser?.email}</Link>
 				</PopoverTrigger>
 				<PopoverContent bgColor="#2c698d" w="100%" color="white">
 					<PopoverArrow bgColor="#2c698d" />

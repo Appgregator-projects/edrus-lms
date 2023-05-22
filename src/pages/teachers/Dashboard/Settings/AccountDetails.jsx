@@ -33,28 +33,34 @@ const AccountDetails = () => {
 	// const { uid } = UseAuthState();
 	const [data, setData] = useState({});
 	const [avatarUpdated, setAvatarUpdated] = useState(false);
+	const currentUser = authFirebase?.currentUser;
 
-	const currentUser = authFirebase.currentUser;
 	const getData = async () => {
-		const docRef = doc(db, "users", currentUser.uid);
-		const docSnap = await getDoc(docRef);
-		if (docSnap.exists()) {
-			console.log("Document data:", docSnap.data());
-			const user = docSnap.data();
-			console.log(user);
-			setData(user);
-		} else {
-			// docSnap.data() will be undefined in this case
-			console.log("No such document!");
+		if (currentUser) {
+			try {
+				const docRef = doc(db, "users", currentUser?.uid);
+				const docSnap = await getDoc(docRef);
+				if (docSnap.exists()) {
+					console.log("Document data:", docSnap.data());
+					const user = docSnap.data();
+					console.log(user);
+					setData(user);
+				} else {
+					// docSnap.data() will be undefined in this case
+					console.log("No such document!");
+				}
+				setAvatarUpdated(false);
+			} catch (error) {
+				console.log(error);
+			}
 		}
-		setAvatarUpdated(false);
 	};
 	const toast = useToast();
 	const updateData = () => {
-		const path = `/user/${currentUser.uid}/profile-pict/${data.image.name}`;
+		const path = `/user/${currentUser?.uid}/profile-pict/${data?.image?.name}`;
 
 		const storageRef = ref(storage, path);
-		const uploadTask = uploadBytesResumable(storageRef, data.image);
+		const uploadTask = uploadBytesResumable(storageRef, data?.image);
 		uploadTask.on(
 			"state_changed",
 			(snapshot) => {
@@ -88,7 +94,7 @@ const AccountDetails = () => {
 						});
 						data.image = downloadURL;
 						// update data
-						const ref = doc(db, "users", currentUser.uid);
+						const ref = doc(db, "users", currentUser?.uid);
 						setDoc(ref, data, { merge: true });
 						setAvatarUpdated(true);
 						toast({
@@ -98,7 +104,7 @@ const AccountDetails = () => {
 							duration: 9000,
 							isClosable: true,
 						});
-						setData({});
+						// setData({});
 						console.log(data, "ni data");
 					});
 			}
@@ -107,7 +113,7 @@ const AccountDetails = () => {
 
 	useEffect(() => {
 		getData();
-	}, [avatarUpdated]);
+	}, [data.image]);
 	return (
 		<>
 			<Flex align="center" gap="2" my="5" justify="space-between">
@@ -166,7 +172,7 @@ const AccountDetails = () => {
 						<Input
 							type="text"
 							isDisabled
-							value={currentUser.uid}
+							value={currentUser?.uid}
 						/>
 					</FormControl>
 					<FormControl>
@@ -180,7 +186,7 @@ const AccountDetails = () => {
 									email: e.target.value,
 								})
 							}
-							value={data.email}
+							value={data?.email}
 						/>
 					</FormControl>
 					<FormControl>
