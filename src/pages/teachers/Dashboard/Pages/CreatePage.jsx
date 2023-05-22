@@ -35,6 +35,7 @@ import {
 	FiUser,
 	FiYoutube,
 	FiSettings,
+	FiCheck,
 } from "react-icons/fi";
 import Sidebar from "../../../../components/teachers/Sidebar";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -46,7 +47,7 @@ import { ChevronLeftIcon } from "@chakra-ui/icons";
 function CreatePage() {
 	const [dataBase, setDataBase] = useState();
 	const [data, setData] = useState([]);
-	const [click, setClick] = useState({ id: null, tap: false });
+	const [click, setClick] = useState({ id: null, tap: false, title: "" });
 	const navigate = useNavigate();
 	const [input, setInput] = useState(false);
 	const param = useParams();
@@ -126,7 +127,7 @@ function CreatePage() {
 		const docSnap = await getDoc(docRef);
 
 		if (docSnap.exists()) {
-			console.log("Document data:", docSnap.data());
+			// console.log("Document data:", docSnap.data());
 			setDataBase(docSnap.data());
 			if (docSnap.data().data) setData(docSnap.data().data);
 		} else {
@@ -144,6 +145,16 @@ function CreatePage() {
 		setDoc(cityRef, newData, { merge: true });
 		navigate(-1);
 	};
+	const handlePut = (id) => {
+		const newItems = data;
+
+		newItems[id].title = click.title;
+		setData(newItems);
+
+		setClick({ ...click, tap: !click.tap });
+		setInput(!input);
+		console.log(newItems, "ni data");
+	};
 
 	function onDragEnd(result) {
 		if (!result.destination) {
@@ -158,13 +169,13 @@ function CreatePage() {
 	const Card = (props) => {
 		const datas = props.data;
 		const index = props.index;
-		console.log(datas, "ni datas");
+		// console.log(datas, "ni datas");
 		return (
 			<HStack bgColor="gray.100" borderRadius="md" p="2" m="1">
 				{/* {props.provided} */}
 				<FiMoreVertical />
 				<Box>
-					<Text m="0">{click.data.title}</Text>
+					<Text m="0">{datas.title}</Text>
 					<Text m="0">
 						www.yourdomain.com/
 						{datas.title.replace(/ +/g, "-").toLowerCase()}
@@ -183,13 +194,13 @@ function CreatePage() {
 										index !== click.id
 											? setClick({
 													id: index,
-													data: datas,
 													tap: true,
+													title: datas.title,
 											  })
 											: setClick({
 													id: index,
-													data: datas,
 													tap: !click.tap,
+													title: datas.title,
 											  })
 									}
 								/>
@@ -208,7 +219,7 @@ function CreatePage() {
 			</HStack>
 		);
 	};
-	console.log(click, "ni click");
+	// console.log(data, "ni data");
 	useEffect(() => {
 		getData();
 
@@ -364,40 +375,42 @@ function CreatePage() {
 																	</Text>
 																) : (
 																	<Input
-																		w="fit-content"
 																		type="text"
 																		variant="unstyled"
-																		value={
-																			click
-																				.data
-																				.title
-																		}
+																		w="fit-content"
 																		onChange={(
 																			e
 																		) =>
 																			setClick(
 																				{
 																					...click,
-																					data: {
-																						...data,
-																						title: e
-																							.target
-																							.value,
-																					},
+																					title: e
+																						.target
+																						.value,
 																				}
 																			)
 																		}
 																	/>
 																)}
-
-																<FiEdit
-																	cursor="pointer"
-																	onClick={() =>
-																		setInput(
-																			!input
-																		)
-																	}
-																/>
+																{!input ? (
+																	<FiCheck
+																		cursor="pointer"
+																		onClick={() =>
+																			handlePut(
+																				index
+																			)
+																		}
+																	/>
+																) : (
+																	<FiEdit
+																		cursor="pointer"
+																		onClick={() =>
+																			setInput(
+																				!input
+																			)
+																		}
+																	/>
+																)}
 															</Flex>
 														) : (
 															<></>
