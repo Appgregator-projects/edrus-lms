@@ -47,9 +47,10 @@ import {
 import { BsPalette, BsPencil } from "react-icons/bs";
 import RichTextEditor from "../../../../../components/teachers/Summernote";
 import DropDrag from "../../../../../components/teachers/DropDrag";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const EditOffer = () => {
+	const navigate = useNavigate();
 	const [addProduct, setAddProduct] = useState(false);
 	const [productAccess, setProductAccess] = useState({
 		date: false,
@@ -84,6 +85,7 @@ const EditOffer = () => {
 						bgColor="black"
 						color="white"
 						colorScheme="blackAlpha"
+						onClick={() => navigate("/teacher/offers")}
 					>
 						Save
 					</Button>

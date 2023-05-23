@@ -13,17 +13,106 @@ import {
 	Flex,
 	Square,
 	CloseButton,
+	useToast,
+	Spinner,
+	Stack,
+	Checkbox,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../../../../../components/teachers/Sidebar";
 import { BsCalendarEvent, BsCoin } from "react-icons/bs";
-import { useState } from "react";
 import { AiFillInfoCircle, AiOutlineStop } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import { db } from "../../../../../config/firebase";
+import {
+	addDoc,
+	collection,
+	getDocs,
+	query,
+	where,
+	updateDoc,
+	doc,
+} from "firebase/firestore";
+
 const NewOffer = () => {
+	const [loading, setLoading] = useState(false);
 	const [stage, setStage] = useState(false);
 	const [paid, setPaid] = useState(null);
+	const toast = useToast();
+	const PROJECT_ID = "rifqyganteng";
+	const [titleOffer, setTitleOffer] = useState("");
+	const [descriptionOffer, setDescriptionOffer] = useState("");
+	const [typeOffer, setTypeOffer] = useState("");
+	const [amountOffer, setAmountOffer] = useState(0);
+	const [scheduleOffer, setScheduleOffer] = useState("");
+	const [coursesList, setCoursesList] = useState([]);
+	const [productActive, setProductActive] = useState([]);
+
+	const handleAddOffer = async () => {
+		setLoading(true);
+
+		const dataObject = {
+			project_id: PROJECT_ID,
+			product_type: typeOffer,
+			product_schedule: typeOffer === "product" ? "UNLIMITED" : scheduleOffer,
+			label: titleOffer,
+			description: descriptionOffer,
+			price: Number(amountOffer),
+			created_at: new Date(),
+			status: "all",
+			product_active: productActive,
+		};
+
+		try {
+			const docRef = await addDoc(collection(db, "offers"), dataObject);
+			console.log("Added document with ID: ", docRef.id);
+			if (docRef.id) {
+				toast({
+					title: "Rifqy Ganteng",
+					description: "Success add offers.",
+					status: "success",
+				});
+			}
+			setLoading(false);
+		} catch (error) {
+			console.log(error, "ini error");
+			setLoading(false);
+		}
+	};
+
+	const getProducts = async () => {
+		try {
+			const col = collection(db, "courses");
+			const q = query(col, where("project_id", "==", PROJECT_ID));
+			const querySnapshot = await getDocs(q);
+			const dataArr = querySnapshot.docs.map((doc) => ({
+				ID: doc.id,
+				...doc.data(),
+			}));
+			setCoursesList(dataArr);
+			console.log(dataArr, "ini data");
+		} catch (error) {
+			console.log(error, "ini error");
+		}
+	};
+
+	useEffect(() => {
+		getProducts();
+		return () => { };
+	}, []);
+
+	const handleAddProductActive = (selectedCourse) => {
+		setProductActive((prevProducts) => [...prevProducts, selectedCourse]);
+	};
+
+	const handleRemoveProductActive = (selectedCourse) => {
+		setProductActive((prevProducts) =>
+			prevProducts.filter((product) => product.ID !== selectedCourse.ID)
+		);
+	};
+
 	const navigate = useNavigate();
+
 	return (
 		<>
 			<Grid templateColumns="40% 60%">
@@ -34,67 +123,126 @@ const NewOffer = () => {
 								What product(s) are you selling?
 							</Text>
 							<Text color="#8D939A">
-								Selling has never be easier. We'll help
-								you price and sell your ofeer in a
-								couple easy steps.
+								Selling has never be easier. We'll help you price and sell your
+								offer in a couple easy steps.
 							</Text>
 
 							<Box>
 								<FormControl>
-									<FormLabel>Offer title</FormLabel>
-									<Input placeholder="(required)" />
+									<FormLabel>Offer Title</FormLabel>
+									<Input
+										placeholder="(required)"
+										onChange={(e) => setTitleOffer(e.target.value)}
+									/>
 								</FormControl>
+
 								<FormControl>
-									<FormLabel>
-										Product(s) in this offer
-									</FormLabel>
-									<Select>
-										<option>product 1</option>
-										<option>product 2</option>
+									<FormLabel>Offer Description</FormLabel>
+									<Input
+										placeholder="(required)"
+										onChange={(e) => setDescriptionOffer(e.target.value)}
+									/>
+								</FormControl>
+
+								<FormControl>
+									<FormLabel>Offer Type</FormLabel>
+									<Select
+										onChange={(e) => setTypeOffer(e.target.value)}
+										placeholder="Type"
+									>
+										<option value="subscription">Subscription</option>
+										<option value="product">One-time</option>
 									</Select>
 								</FormControl>
-								<Card p="5" my="5">
-									<Flex
-										align="center"
-										justify="space-between"
+
+								{typeOffer === "subscription" && (
+									<FormControl>
+										<FormLabel>Offer Schedule</FormLabel>
+										<Select
+											onChange={(e) => setScheduleOffer(e.target.value)}
+											accessibilityLabel="schedule"
+											placeholder="schedule"
+										>
+											<option value="WEEK">1 Week</option>
+											<option value="MONTH">1 Month</option>
+										</Select>
+									</FormControl>
+								)}
+
+								<FormControl>
+									<FormLabel>Offer Price (Rp.)</FormLabel>
+									<Input
+										type="number"
+										placeholder="(required)"
+										onChange={(e) => setAmountOffer(e.target.value)}
+									/>
+								</FormControl>
+
+								<FormControl>
+									<FormLabel>List Product Active</FormLabel>
+									<Select
+									accessibilityLabel="set Product Active"
+									placeholder="set Product Active"
+										onChange={(e) => {
+											const selectedCourse = coursesList.find(
+												(course) => course.ID === e.target.value
+											);
+											handleAddProductActive(selectedCourse);
+										}}
 									>
-										<Flex gap="5">
-											<Square
-												bgColor="#abe9ff"
-												borderRadius="10px"
-												w="50px"
-												h="50px"
-											>
-												<BsCalendarEvent
-													color="#000080"
-													fontSize="25px"
-												/>
-											</Square>
-											<Box>
-												<Text
-													fontWeight="semibold"
-													m="0"
+										{coursesList.map((course) => (
+											<option key={course.ID} value={course.ID}>
+												{course.title}
+											</option>
+										))}
+									</Select>
+								</FormControl>
+
+								{productActive.map((course) => (
+									<Card p="5" my="5" key={course.ID}>
+										<Flex align="center" justify="space-between">
+											<Flex gap="5">
+												<Square
+													bgColor="#abe9ff"
+													borderRadius="10px"
+													w="50px"
+													h="50px"
 												>
-													product 1
-												</Text>
-												<Text m="0">
-													Coaching
-												</Text>
-											</Box>
+													<BsCalendarEvent
+														color="#000080"
+														fontSize="25px"
+													/>
+												</Square>
+												<Box>
+													<Text fontWeight="semibold" m="0">
+														{course.title}
+													</Text>
+													<Text m="0">{course.category}</Text>
+												</Box>
+											</Flex>
+											<CloseButton
+												onClick={() => handleRemoveProductActive(course)}
+											/>
 										</Flex>
-										<CloseButton />
-									</Flex>
-								</Card>
-								<Button
-									my="5"
-									w="100%"
-									bgColor="black"
-									color="white"
-									colorScheme="blackAlpha"
-									onClick={() => setStage(true)}
-								>
-									Continue
-								</Button>
+									</Card>
+								))}
+
+								{loading ? (
+									<Stack alignItems={"center"} justifyContent="center">
+										<Spinner />
+									</Stack>
+								) : (
+									<Button
+										my="5"
+										w="100%"
+										bgColor="black"
+										color="white"
+										colorScheme="blackAlpha"
+										onClick={() => handleAddOffer()}
+									>
+										Continue
+									</Button>
+								)}
 							</Box>
 						</>
 					) : (
@@ -103,17 +251,12 @@ const NewOffer = () => {
 								Price your offer
 							</Text>
 							<Text color="#8D939A">
-								Choose whether this Course is paid or
-								free. If it's paid, set its price and
-								payment preferences.
+								Choose whether this Course is paid or free. If it's paid, set
+								its price and payment preferences.
 							</Text>
 							<Flex align="center" gap="5">
 								<Box
-									border={
-										paid === true
-											? "2px solid black"
-											: "1px solid #bbbcbd"
-									}
+									border={paid === true ? "2px solid black" : "1px solid #bbbcbd"}
 									w="50%"
 									p="5"
 									borderRadius="10px"
@@ -121,11 +264,11 @@ const NewOffer = () => {
 									_hover={
 										paid === true
 											? {
-													border: "2px solid black",
-											  }
+												border: "2px solid black",
+											}
 											: {
-													border: "1px solid #656769",
-											  }
+												border: "1px solid #656769",
+											}
 									}
 									onClick={() => setPaid(true)}
 								>
@@ -133,11 +276,7 @@ const NewOffer = () => {
 									<Text m="0">Paid</Text>
 								</Box>
 								<Box
-									border={
-										paid === false
-											? "2px solid black"
-											: "1px solid #bbbcbd"
-									}
+									border={paid === false ? "2px solid black" : "1px solid #bbbcbd"}
 									w="50%"
 									p="5"
 									borderRadius="10px"
@@ -145,11 +284,11 @@ const NewOffer = () => {
 									_hover={
 										paid === false
 											? {
-													border: "2px solid black",
-											  }
+												border: "2px solid black",
+											}
 											: {
-													border: "1px solid #656769",
-											  }
+												border: "1px solid #656769",
+											}
 									}
 									onClick={() => setPaid(false)}
 								>
@@ -169,18 +308,12 @@ const NewOffer = () => {
 										<AiFillInfoCircle color="#0072ef" />
 									</Box>
 									<Box w="95%">
-										<Text
-											m="0"
-											fontWeight="semibold"
-										>
+										<Text m="0" fontWeight="semibold">
 											Getting paid
 										</Text>
 										<Text my="2">
-											Kajabi collects no fees
-											on any payments! To
-											charge and receive
-											payments you will need to
-											connect to Stripe or
+											Kajabi collects no fees on any payments! To charge and
+											receive payments you will need to connect to Stripe or
 											Paypal.
 										</Text>
 										<Text
@@ -192,14 +325,9 @@ const NewOffer = () => {
 											}}
 											m="0"
 											cursor="pointer"
-											onClick={() =>
-												navigate(
-													"/teacher/settings/payment"
-												)
-											}
+											onClick={() => navigate("/teacher/settings/payment")}
 										>
-											Connect a payment
-											provider
+											Connect a payment provider
 										</Text>
 									</Box>
 								</Flex>
@@ -222,11 +350,7 @@ const NewOffer = () => {
 									colorScheme="blackAlpha"
 									color="white"
 									w="100%"
-									onClick={() =>
-										navigate(
-											"/teacher/setting/offers/1234/edit"
-										)
-									}
+									onClick={() => navigate("/teacher/offers/1234/edit")}
 								>
 									Save and Finish
 								</Button>

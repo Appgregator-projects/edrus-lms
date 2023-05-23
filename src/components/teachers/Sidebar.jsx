@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import {
 	IconButton,
 	Box,
@@ -20,8 +20,9 @@ import {
 	PopoverArrow,
 	PopoverBody,
 	Circle,
+	Button,
 } from "@chakra-ui/react";
-import { FiHome, FiMenu, FiSettings, FiUsers } from "react-icons/fi";
+import { FiClipboard, FiHome, FiMenu, FiSettings, FiUsers } from "react-icons/fi";
 import { IconType } from "react-icons";
 import {
 	BsDoorOpenFill,
@@ -30,7 +31,7 @@ import {
 	BsEnvelope,
 } from "react-icons/bs";
 
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { UseAuthDispatch } from "../../context/Context";
 import { signOut } from "firebase/auth";
 import { authFirebase } from "../../config/firebase";
@@ -40,16 +41,15 @@ interface LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
 	{ name: "Dashboard", icon: FiHome, link: "/teacher/dashboard" },
+	{ name: "Pages", icon: FiClipboard, link: "/teacher/pages" },
 	{ name: "Course", icon: BsBook, link: "/teacher/courses" },
 	// { name: 'Sections', icon: AiOutlineSnippets, link: '/teacher/sections' },
 	// { name: 'Lessons', icon: RiFileList2Line, link: '/teacher/lessons' },
 	// { name: 'Assignment', icon: FaTasks, link: '/teacher/assignment' },
 	// { name: 'Quiz', icon: BsFileCheck, link: '/teacher/quiz' },
-	{ name: "Sales", icon: BsFileCheck, link: "/teacher/offers/new/banner" },
+	{ name: "Sales", icon: BsFileCheck, link: "#" },
 	{ name: "Customers", icon: FiUsers, link: "/teacher/customers" },
 	{ name: "Setting", icon: FiSettings, link: "/teacher/settings" },
-
-	{ name: "Logout", icon: BsDoorOpenFill, link: "/teacher/login" },
 ];
 
 export default function Sidebar({ children }: { children: ReactNode }) {
@@ -70,11 +70,11 @@ export default function Sidebar({ children }: { children: ReactNode }) {
 				size="full"
 			>
 				<DrawerContent>
-					<SidebarContent onClose={onClose} />
+					{/* <SidebarContent onClose={onClose} /> */}
 				</DrawerContent>
 			</Drawer>
 			{/* mobilenav */}
-			<MobileNav onOpen={onOpen} />
+			{/* <MobileNav onOpen={onOpen} /> */}
 			<Box ml={{ base: 0, md: 60 }} p="4">
 				{children}
 			</Box>
@@ -88,25 +88,39 @@ interface SidebarProps extends BoxProps {
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 	const navigate = useNavigate();
-	const dispatch = UseAuthDispatch()
+	const location = useLocation();
+	// console.log(location, "ni location");
+	const [sales, setSales] = useState(location.pathname);
+	// console.log(sales, "ni sales");
+	const salesItem = [
+		{ name: "Offers", link: "/teacher/offers" },
+		{ name: "Coupons", link: "/teacher/coupons" },
+		{ name: "Payments", link: "/teacher/payments" },
+	];
+	const handleClick = (params) => {
+		navigate(params);
+		setSales(location.pathname);
+	};
+	const dispatch = UseAuthDispatch();
 
 	const _logout = async () => {
-		dispatch({ type: "INIT_START" })
-		console.log("logging out")
-		signOut(authFirebase).then(() => {
-			// Sign-out successful.
-			navigate('/');
-			localStorage.removeItem('user')
-			dispatch({ type: "LOGOUT_SUCCESS" })
-
-		}).catch((error) => {
-			// An error happened.
-			alert(error.message)
-		}).finally(() => {
-			dispatch({ type: "INIT_FINISH" })
-		})
+		dispatch({ type: "INIT_START" });
+		console.log("logging out");
+		signOut(authFirebase)
+			.then(() => {
+				// Sign-out successful.
+				navigate("/");
+				localStorage.removeItem("user");
+				dispatch({ type: "LOGOUT_SUCCESS" });
+			})
+			.catch((error) => {
+				// An error happened.
+				alert(error.message);
+			})
+			.finally(() => {
+				dispatch({ type: "INIT_FINISH" });
+			});
 	};
-
 
 	return (
 		<Box
@@ -141,19 +155,37 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 				/>
 			</Flex>
 			{LinkItems.map((link) => (
-				<NavItem
-					key={link.name}
-					icon={link.icon}
-					onClick={() => navigate(`${link.link}`)}
-				>
-					{link.name}
-				</NavItem>
+				<>
+					<NavItem
+						key={link.name}
+						icon={link.icon}
+						onClick={() => {
+							link.name === "Sales"
+								? setSales("Sales")
+								: handleClick(link.link);
+						}}
+					>
+						{link.name}
+					</NavItem>
+					{sales === "Sales" && link.name === "Sales" ? (
+						salesItem.map((item) => (
+							<>
+								<NavItem
+									key={item.name}
+									onClick={() => {
+										navigate(`${item.link}`);
+									}}
+								>
+									{item.name}
+								</NavItem>
+							</>
+						))
+					) : (
+						<></>
+					)}
+				</>
 			))}
-			<NavItem
-
-				icon={BsDoorOpenFill}
-				onClick={() => _logout()}
-			>
+			<NavItem icon={BsDoorOpenFill} onClick={() => _logout()}>
 				Logout
 			</NavItem>
 		</Box>
@@ -205,6 +237,7 @@ interface MobileProps extends FlexProps {
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	const navigate = useNavigate();
+	const currentUser = authFirebase.currentUser;
 
 	return (
 		<Flex
@@ -231,7 +264,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 			</Flex>
 			<Popover islazy trigger={"hover"}>
 				<PopoverTrigger>
-					<Link>Hi, User1</Link>
+					<Link>Hi, {currentUser.email}</Link>
 				</PopoverTrigger>
 				<PopoverContent bgColor="#2c698d" w="100%" color="white">
 					<PopoverArrow bgColor="#2c698d" />

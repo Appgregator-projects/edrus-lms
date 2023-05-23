@@ -37,11 +37,32 @@ import NewOffer from "../pages/teachers/Dashboard/Sales/Offer/NewOffer";
 import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNewOffer";
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
 import EditOfferPage from "../pages/teachers/Dashboard/Sales/Offer/EditOffer";
+import CouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/Coupons";
+import BannerNewCouponPage from "../pages/teachers/Dashboard/Sales/Coupons/BannerNewCoupon";
+import NewCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/NewCoupons";
+import EditCouponsPage from "../pages/teachers/Dashboard/Sales/Coupons/EditCoupons";
+import BannerNewPaymentPage from "../pages/teachers/Dashboard/Sales/Payments/BannerNewPayment";
+import AffiliatesPage from "../pages/teachers/Dashboard/Sales/Affiliates/Affiliates";
 import { UseAuthState } from "../context/Context";
 import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
 import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
 import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";
 import SettingPage from "../pages/teachers/Dashboard/Settings/SettingPage";
+import SiteDetailsPage from "../pages/teachers/Dashboard/Settings/SiteDetails";
+import DripSettings from "../pages/teachers/Dashboard/Settings/DripSettings";
+import DripSettingsPage from "../pages/teachers/Dashboard/Settings/DripSettings";
+import DomainSettingPage from "../pages/teachers/Dashboard/Settings/Domain/DomainSetting";
+import DNSSettingPages from "../pages/teachers/Dashboard/Settings/Domain/DNSSetting";
+
+import PaymentPages from "../pages/teachers/Dashboard/Sales/Payments/Payment";
+import AccountDetailsPages from "../pages/teachers/Dashboard/Settings/AccountDetails";
+import AccountUserPages from "../pages/teachers/Dashboard/Settings/AccountUser/AccountUser";
+import NewAccountPages from "../pages/teachers/Dashboard/Settings/AccountUser/NewAccount";
+// import Pagespage from "../pages/teachers/Dashboard/Pages/Pagespage";
+import Page from "../pages/teachers/Dashboard/Pages/Page";
+import CreatePage from "../pages/teachers/Dashboard/Pages/CreatePage";
+import PaymentPageV2 from "../pages/all/PaymentPageV2";
+import DesignPage from "../pages/teachers/Dashboard/Pages/DesignPage";
 
 const Routers = () => {
 	const { user } = UseAuthState();
@@ -126,6 +147,7 @@ const Routers = () => {
 					</ProtectedRoute>
 				}
 			/>
+
 			<Route
 				path="/profile"
 				element={
@@ -380,6 +402,41 @@ const Routers = () => {
 			/>
 
 			{/* ======================================================================== */}
+			<Route
+				path="/teacher/pages"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<Page />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/pages/:id"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<CreatePage />
+					</ProtectedRoute>
+				}
+			/>
+			<Route
+				path="/teacher/pages/:id/design"
+				element={
+					<ProtectedRoute
+						user={user?.role === "teacher"}
+						redirectPath="/"
+					>
+						<DesignPage />
+					</ProtectedRoute>
+				}
+			/>
+
+			{/* ======================================================================== */}
 
 			{/* course - section - lesson */}
 			<Route
@@ -494,15 +551,67 @@ const Routers = () => {
 				path="/teacher/offers/new/banner"
 				element={<BannerNewOfferPage />}
 			/>
-
+			<Route path="/teacher/payments" element={<PaymentPages />} />
 			<Route
-				path="/teacher/settings/payment"
+				path="/teacher/settings/payments"
 				element={<PaymentPage />}
 			/>
 
 			<Route
-				path="/teacher/setting/offers/:id/edit"
+				path="/teacher/offers/:id/edit"
 				element={<EditOfferPage />}
+			/>
+			<Route path="/teacher/coupons" element={<CouponsPage />} />
+			<Route
+				path="/teacher/coupons/new"
+				element={<NewCouponsPage />}
+			/>
+
+			<Route
+				path="/teacher/coupons/new/banner"
+				element={<BannerNewCouponPage />}
+			/>
+			<Route
+				path="/teacher/coupons/:id/edit"
+				element={<EditCouponsPage />}
+			/>
+			<Route
+				path="/teacher/payments/new/banner"
+				element={<BannerNewPaymentPage />}
+			/>
+			<Route path="/teacher/affiliates" element={<AffiliatesPage />} />
+			<Route
+				path="/teacher/settings/site-detail"
+				element={<SiteDetailsPage />}
+			/>
+			<Route
+				path="/teacher/settings/drip-setting"
+				element={<DripSettingsPage />}
+			/>
+			<Route
+				path="/teacher/settings/domain"
+				element={<DomainSettingPage />}
+			/>
+			<Route
+				path="/teacher/settings/dns/:id"
+				element={<DNSSettingPages />}
+			/>
+			<Route
+				path="/teacher/settings/account-detail"
+				element={<AccountDetailsPages />}
+			/>
+			<Route
+				path="/teacher/settings/account-users"
+				element={<AccountUserPages />}
+			/>
+			<Route
+				path="/teacher/settings/account-users/new"
+				element={<NewAccountPages />}
+			/>
+
+			<Route
+				path="/payment"
+				element={<PaymentPageV2 />}
 			/>
 		</Routes>
 	);
