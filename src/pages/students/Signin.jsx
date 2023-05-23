@@ -83,7 +83,6 @@ const Signin = () => {
                 // doc.data() is never undefined for query doc snapshots
                 arr.push(doc.id)
             });
-            console.log("asu", arr)
             dispatch({
                 type : 'GET_PROJECT_SUCCESS',
                 payload : [...arr]
@@ -99,7 +98,6 @@ const Signin = () => {
                 getProjects()
             }, 2000)
         }
-    };
 
 
 
@@ -108,13 +106,14 @@ const Signin = () => {
 			const docRef = doc(db, "users", uid);
 			const docSnap = await getDoc(docRef);
 
-			if (docSnap) {
+			if (docSnap.exists()) {
 				dispatch({ type: "LOGIN_SUCCESS", payload: { user: docSnap.data(), user_uid: uid } })
 			} else {
 				console.log("Document not found in users collection");
-				dispatch({ type: "LOGIN_SUCCESS", payload: { user: data, user_uid: data.uid } })
+				dispatch({ type: "LOGIN_SUCCESS", payload: { user: {name : data.email, ...data}, user_uid: data.uid } })
 			};
 		}
+
 		async function getProjects() {
 			const citiesRef = collection(db, "projects");
 			const q = query(citiesRef, where("admin", "array-contains", uid));
@@ -124,7 +123,6 @@ const Signin = () => {
 				// doc.data() is never undefined for query doc snapshots
 				arr.push(doc.id)
 			});
-			console.log("asu", arr)
 			dispatch({
 				type : 'GET_PROJECT_SUCCESS',
 				payload : [...arr]
@@ -132,6 +130,7 @@ const Signin = () => {
 		}
 
 		if (uid) {
+			console.log(uid, "uids")
 			getUserData()
 			getProjects()
 		} else {
