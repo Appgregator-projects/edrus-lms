@@ -38,7 +38,6 @@ import BannerNewOfferPage from "../pages/teachers/Dashboard/Sales/Offer/BannerNe
 import PaymentPage from "../pages/teachers/Dashboard/Settings/Payment";
 import EditOfferPage from "../pages/teachers/Dashboard/Sales/Offer/EditOffer";
 import { UseAuthState } from "../context/Context";
-import ProtectedRoute from "./ProtectedRoute";
 import CustomersPage from "../pages/teachers/Dashboard/Customers/CustomersPage";
 import CustomersTagsPage from "../pages/teachers/Dashboard/Customers/CustomersTagsPage";
 import CustomersSinglePage from "../pages/teachers/Dashboard/Customers/CustomersSinglePage";

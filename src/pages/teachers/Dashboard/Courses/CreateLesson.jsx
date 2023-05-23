@@ -27,16 +27,8 @@ import {
 	Tabs,
 	Tab,
 	Text,
-	Center,
 	Container,
 	useDisclosure,
-	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalHeader,
-	ModalFooter,
-	ModalBody,
-	ModalCloseButton,
 	Select,
 	CircularProgress,
 } from '@chakra-ui/react';
@@ -44,7 +36,7 @@ import { FiDelete, FiDownload, FiEdit3, FiEyeOff, FiVideo, FiVolume2 } from 'rea
 import Sidebar from '../../../../components/teachers/Sidebar';
 import { db, storage } from '../../../../config/firebase';
 import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -67,7 +59,6 @@ function CreateLesson() {
 	const [modalFor, setModalFor] = useState("")
 	const [newData, setNewData] = useState({})
 	const [file, setFile] = useState()
-	const { isOpen, onOpen, onClose } = useDisclosure()
 	const { state } = useLocation()
 
 
