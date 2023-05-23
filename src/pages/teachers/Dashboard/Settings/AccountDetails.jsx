@@ -27,11 +27,18 @@ import { FiCopy } from "react-icons/fi";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { authFirebase, db, storage } from "../../../../config/firebase";
 import { UseAuthState } from "../../../../context/Context";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+	deleteObject,
+	getDownloadURL,
+	ref,
+	uploadBytesResumable,
+} from "firebase/storage";
+import { onAuthStateChanged, updateProfile } from "firebase/auth";
 const AccountDetails = () => {
 	// get data, use efffect, onchange
 	// const { uid } = UseAuthState();
 	const [data, setData] = useState({});
+	const [pict, setPict] = useState(false);
 	const currentUser = authFirebase.currentUser;
 	const getData = async () => {
 		const docRef = doc(db, "users", currentUser.uid);
@@ -47,65 +54,174 @@ const AccountDetails = () => {
 		}
 	};
 	const toast = useToast();
-	const updateData = () => {
+	// const updateData = (type) => {
+	// 	updateProfile(
+	// 		currentUser,
+	// 		type !== "delete"
+	// 			? {
+	// 					displayName: data.name,
+	// 					photoURL: data.image,
+	// 			  }
+	// 			: { photoUrl: "" }
+	// 	)
+	// 		.then((response) => {
+	// 			console.log(response, "xxxxxxxxx");
+	// 			if (type === "delete") {
+	// 				toast({
+	// 					title: "Profile Picture deleted",
+	// 					description:
+	// 						"Your profile picture has been deleted!",
+	// 					status: "error",
+	// 					duration: 9000,
+	// 					isClosable: true,
+	// 				});
+	// 			} else {
+	// 				toast({
+	// 					title: "Profile Saved",
+	// 					description: "Your profile has been saved!",
+	// 					status: "success",
+	// 					duration: 9000,
+	// 					isClosable: true,
+	// 				});
+	// 			}
+	// 		})
+	// 		.catch((error) => {
+	// 			// An error occurred
+	// 			// ...
+	// 		});
+	// };
+
+	// const updateData = (type) => {
+	// 	try {
+	// 		console.log(data.image, "IMAGEEEE");
+	// 		if (type !== "delete") {
+	// 			updateProfile(currentUser, {
+	// 				displayName: data.name,
+	// 				photoURL: `${data.image}.${data.type}`,
+	// 			});
+	// 			toast({
+	// 				title: "Profile Saved",
+	// 				description: "Your profile has been saved!",
+	// 				status: "success",
+	// 				duration: 9000,
+	// 				isClosable: true,
+	// 			});
+	// 		} else {
+	// 			updateProfile(currentUser, {
+	// 				photoURL: "",
+	// 			});
+
+	// 			toast({
+	// 				title: "Profile Saved Error",
+	// 				description: "Your profile has not been saved!",
+	// 				status: "error",
+	// 				duration: 9000,
+	// 				isClosable: true,
+	// 			});
+	// 		}
+	// 		setPict(!pict);
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 	}
+	// };
+
+	// const pulu = authFirebase.currentUser;
+	console.log(currentUser, "ni currentUser");
+	const updateData = (type) => {
 		const path = `/user/${currentUser.uid}/profile-pict/${data.image.name}`;
 
 		const storageRef = ref(storage, path);
-		const uploadTask = uploadBytesResumable(storageRef, data.image);
-		uploadTask.on(
-			"state_changed",
-			(snapshot) => {
-				const progress =
-					(snapshot.bytesTransferred / snapshot.totalBytes) *
-					100;
-				console.log("Upload is " + progress + "% done");
-				// if (progress !== 100) setLoading(progress);
-				// else {
-				// 	setLoading(false);
-				// }
-			},
-			(error) => {
-				console.log(error.message);
-			},
-			() => {
-				getDownloadURL(uploadTask.snapshot.ref)
-					.then((downloadURL) => {
-						console.log("File available at", downloadURL);
 
-						setData({
-							...data,
-							image: downloadURL,
-						});
-						return downloadURL;
-					})
-					.then((downloadURL) => {
-						setData({
-							...data,
-							updatedAt: new Date(),
-						});
-						data.image = downloadURL;
-						// update data
-						const ref = doc(db, "users", currentUser.uid);
-						setDoc(ref, data, { merge: true });
-						// setLoading(true);
-						toast({
-							title: "Profile Saved",
-							description: "Your profile has been saved!",
-							status: "success",
-							duration: 9000,
-							isClosable: true,
-						});
-
-						console.log(data, "ni data");
+		if (type === "delete") {
+			deleteObject(storageRef)
+				.then(() => {
+					toast({
+						title: "Profile Picture deleted",
+						description:
+							"Your profile picture has been deleted!",
+						status: "error",
+						duration: 9000,
+						isClosable: true,
 					});
-			}
-		);
+					setPict(!pict);
+				})
+				.catch((error) => {
+					toast({
+						title: "Profile Saved Error",
+						description: `${error}`,
+						status: "error",
+						duration: 9000,
+						isClosable: true,
+					});
+				});
+		} else {
+			const uploadTask = uploadBytesResumable(storageRef, data.image);
+			uploadTask.on(
+				"state_changed",
+				(snapshot) => {
+					const progress =
+						(snapshot.bytesTransferred /
+							snapshot.totalBytes) *
+						100;
+					console.log("Upload is " + progress + "% done");
+					// if (progress !== 100) setLoading(progress);
+					// else {
+					// 	setLoading(false);
+					// }
+				},
+				(error) => {
+					console.log(error.message);
+				},
+				() => {
+					getDownloadURL(uploadTask.snapshot.ref)
+						.then((downloadURL) => {
+							console.log(
+								"File available at",
+								downloadURL
+							);
+
+							setData({
+								...data,
+								image: downloadURL,
+							});
+							return downloadURL;
+						})
+						.then((downloadURL) => {
+							setData({
+								...data,
+								updatedAt: new Date(),
+							});
+							data.image = downloadURL;
+							// update data
+							const ref = doc(
+								db,
+								"users",
+								currentUser.uid
+							);
+							setDoc(ref, data, { merge: true });
+							// setLoading(true);
+							toast({
+								title: "Profile Saved",
+								description:
+									"Your profile has been saved!",
+								status: "success",
+								duration: 9000,
+								isClosable: true,
+							});
+							setPict(!pict);
+
+							console.log(data, "ni data");
+						});
+				}
+			);
+		}
 	};
 	useEffect(() => {
 		getData();
-	}, []);
+	}, [pict]);
 	return (
 		<>
+			<Button onClick={() => updateData("apdet")}>testing</Button>
 			<Flex align="center" gap="2" my="5" justify="space-between">
 				<Text m="0" fontWeight="semibold" fontSize="30px">
 					Account Details
@@ -200,25 +316,44 @@ const AccountDetails = () => {
 						my="5"
 					>
 						<Text fontWeight="semibold">Avatar</Text>
-						<HStack gap="3">
-							<Avatar size="lg" src={data.image} />
-							<VStack align="left">
-								<Text m="0">
-									Recommeended dimension{" "}
-									<b>100x100</b>
-								</Text>
-								<Input
-									type="file"
-									onChange={(e) =>
-										setData({
-											...data,
-											image: e.target.files[0],
-										})
-									}
-									src={data.image}
+						{currentUser.photoURL !== null ? (
+							<HStack gap="3">
+								<Avatar
+									size="lg"
+									src={currentUser.photoURL}
 								/>
-							</VStack>
-						</HStack>
+								<Button
+									colorScheme="red"
+									onClick={() =>
+										updateData("delete")
+									}
+								>
+									Delete
+								</Button>
+							</HStack>
+						) : (
+							<HStack gap="3">
+								<Avatar size="lg" src={data.image} />
+								<VStack align="left">
+									<Text m="0">
+										Recommeended dimension{" "}
+										<b>100x100</b>
+									</Text>
+									<Input
+										variant="unstyled"
+										type="file"
+										onChange={(e) =>
+											setData({
+												...data,
+												image: e.target
+													.files[0],
+											})
+										}
+										src={data.image}
+									/>
+								</VStack>
+							</HStack>
+						)}
 					</Box>
 				</GridItem>
 
@@ -306,7 +441,7 @@ const AccountDetails = () => {
 				<Button
 					bgColor="black"
 					colorScheme="blackAlpha"
-					onClick={() => updateData()}
+					// onClick={() => updateData()}
 				>
 					Save
 				</Button>
